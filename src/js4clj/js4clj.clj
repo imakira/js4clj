@@ -13,7 +13,7 @@
                                  (.build)))
 
 (defn- polyglotalize-clojure [value]
-  (-> Context
+  (-> *context*
       (.asValue value)))
 
 (declare clojurify-value)
