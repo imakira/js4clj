@@ -1,4 +1,6 @@
 # javascript-clj/javascript-clj
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fimakira%2Fjs4clj.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fimakira%2Fjs4clj?ref=badge_shield)
+
 
 FIXME: my new library.
 
@@ -44,3 +46,6 @@ _Feel free to remove or change the `LICENSE` file and remove or update this_
 _section of the `README.md` file!_
 
 Distributed under the Eclipse Public License version 1.0.
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fimakira%2Fjs4clj.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fimakira%2Fjs4clj?ref=badge_large)
