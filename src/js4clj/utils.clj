@@ -2,16 +2,25 @@
   (:require [js4clj.core :refer :all]
             [js4clj.js :as js]))
 
-(defmacro js. [obj method & args]
+#_{:clj-kondo/ignore [:syntax]}
+(defmacro js.
+  ;; TODO
+  {:clj-kondo/ignore [:unresolved-symbol :type-mismatch]}
+  [obj method & args]
   `((if (.canInvokeMember ~obj ~(str method))
       (wrap-polyglot-invoke-member ~obj ~(str method))
       (wrap-polyglot-execute (.getMember ~obj ~(str method))))
     ~@args))
 
-(defmacro js.- [obj field]
+(defmacro js.-
+  {:clj-kondo/ignore [:unresolved-symbol :type-mismatch]}
+  [obj field]
   `(#'clojurify-value (.getMember ~obj ~(str field))))
 
-(defmacro js.. [obj & args]
+#_{:clj-kondo/ignore [:syntax]}
+(defmacro js..
+  {:clj-kondo/ignore [:unresolved-symbol :type-mismatch]}
+  [obj & args]
   (if (empty? args)
     obj
     (let [curr# (first args)
@@ -24,7 +33,7 @@
                     `(js.- ~obj ~(subs (str curr#) 1))
                     :else
                     `(js. ~obj ~curr#))
-             ~@rest#))))
+         ~@rest#))))
 
 (defn create-js-array [& args]
   (apply instantiate js/Array args))

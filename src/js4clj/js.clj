@@ -9,7 +9,9 @@
   (intern ns (symbol primitive)
           (clojurify-value (.eval *context* "js" primitive))))
 
-(defmacro define-primitives [ns & primitives]
+(defmacro define-primitives
+  {:clj-kondo/ignore [:unresolved-symbol :type-mismatch]}
+  [ns & primitives]
   (create-ns ns)
   `(doseq [primitive# '~primitives]
      (define-primitive '~ns (str primitive#))))

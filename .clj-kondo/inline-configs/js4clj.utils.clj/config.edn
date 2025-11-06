@@ -1,0 +1,1 @@
+{:config-in-call {js4clj.utils/js. {:ignore [:unresolved-symbol :type-mismatch]}, js4clj.utils/js.- {:ignore [:unresolved-symbol :type-mismatch]}, js4clj.utils/js.. {:ignore [:unresolved-symbol :type-mismatch]}}}
