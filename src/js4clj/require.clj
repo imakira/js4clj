@@ -23,13 +23,18 @@
           (recur (rest rst)
                  (assoc result curr (first rst))))))))
 
-(defn require-js [[module-name & flags]]
+(defn require-js
+  [[module-name & flags] & coll]
   (let [flag-map (parse-flags flags)
         module (require-module module-name)
-        alias (:as flag-map)]
-    (when alias
-      (create-ns alias)
-      (doseq [k (.getMemberKeys module)]
-        (intern alias
-                (symbol k)
-                (clojurify-value (.getMember module k)))))))
+        alias-name (:as flag-map)
+        qualified-module-name (symbol (str "js4clj.modules." module-name))]
+    (create-ns qualified-module-name)
+    (doseq [k (.getMemberKeys module)]
+      (intern qualified-module-name
+              (symbol k)
+              (clojurify-value (.getMember module k))))
+    (when alias-name
+      (alias alias-name qualified-module-name)))
+  (when (seq coll)
+    (apply require-js coll)))
