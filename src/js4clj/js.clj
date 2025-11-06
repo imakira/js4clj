@@ -1,15 +1,44 @@
 (ns js4clj.js
+  (:require [js4clj.context :refer [*context*]]
+            [js4clj.core :refer [clojurify-value]])
   (:import
    [java.util HashMap]
    [org.graalvm.polyglot Context Source Value]))
 
-(defonce ^:dynamic *context*
-  (-> (Context/newBuilder (into-array String ["js"]))
-      (.allowExperimentalOptions true)
-      (.options (HashMap.
-                 {"js.commonjs-require" "true"
-                  "js.commonjs-require-cwd" (str (System/getProperty "user.dir")
-                                                 "/node_modules")}))
-      (.allowIO true)
-      (.build)))
+(defn- define-primitive [ns primitive]
+  (intern ns (symbol primitive)
+          (clojurify-value (.eval *context* "js" primitive))))
+
+(defmacro define-primitives [ns & primitives]
+  (create-ns ns)
+  `(doseq [primitive# '~primitives]
+     (define-primitive '~ns (str primitive#))))
+
+(define-primitives js4clj.js
+  globalThis
+  Infinity
+  NaN
+  undefined
+  null
+  Object
+  Function
+  Boolean
+  Symbol
+  Error
+  Number
+  BigInt
+  Math
+  Date
+  String
+  Array
+  Map
+  Set
+  WeakMap
+  WeakSet
+  JSON
+  ArrayBuffer
+  Promise
+  console)
+
+
 
