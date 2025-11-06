@@ -1,1 +1,1 @@
-{:config-in-call {js4clj.js/define-primitives {:ignore [:unresolved-symbol :type-mismatch]}}}
+{:config-in-call {js4clj.js/define-builtins {:ignore [:unresolved-symbol :type-mismatch]}}}
