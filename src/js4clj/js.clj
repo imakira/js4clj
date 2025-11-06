@@ -5,18 +5,18 @@
    [java.util HashMap]
    [org.graalvm.polyglot Context Source Value]))
 
-(defn- define-primitive [ns primitive]
+(defn- define-builtin [ns primitive]
   (intern ns (symbol primitive)
           (clojurify-value (.eval *context* "js" primitive))))
 
-(defmacro define-primitives
+(defmacro define-builtins
   {:clj-kondo/ignore [:unresolved-symbol :type-mismatch]}
   [ns & primitives]
   (create-ns ns)
   `(doseq [primitive# '~primitives]
-     (define-primitive '~ns (str primitive#))))
+     (define-builtin '~ns (str primitive#))))
 
-(define-primitives js4clj.js
+(define-builtins js4clj.js
   globalThis
   Infinity
   NaN
@@ -42,5 +42,5 @@
   Promise
   console)
 
-
-
+(defn builtin [name]
+  (clojurify-value (.eval *context* "js" name)))

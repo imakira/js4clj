@@ -1,6 +1,6 @@
 (ns js4clj.utils
   (:require [js4clj.core :refer :all]
-            [js4clj.js :as js]))
+            [js4clj.js :as js :refer [builtin]]))
 
 #_{:clj-kondo/ignore [:syntax]}
 (defmacro js.
@@ -36,7 +36,7 @@
          ~@rest#))))
 
 (defn create-js-array [& args]
-  (apply instantiate js/Array args))
+  (apply instantiate (builtin "Array") args))
 
 (defn- polyglot-iterable->vector [^org.graalvm.polyglot.Value obj & [f]]
   (assert (.hasIterator obj))
@@ -76,7 +76,7 @@
         (str obj)
         
         (map? obj)
-        (let [js-obj (instantiate js/Object)]
+        (let [js-obj (instantiate (builtin "Object"))]
           (doseq [[k v] obj]
             (.putMember js-obj (clj->js k) (clj->js v)))
           js-obj)
