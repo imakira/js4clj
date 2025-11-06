@@ -40,8 +40,8 @@
               (.asDouble obj))))
 
 (defn javascript-simple-function? [^org.graalvm.polyglot.Value obj]
-  (and (= (.getMetaQualifiedName (.getMetaObject obj))
-          "Function")
+  (and (and (.getMetaObject obj) (= (.getMetaQualifiedName (.getMetaObject obj))
+                                    "Function"))
        (not (.canInstantiate obj))))
 
 (defn array? [^org.graalvm.polyglot.Value obj]
