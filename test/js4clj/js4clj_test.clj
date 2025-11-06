@@ -3,6 +3,13 @@
             [js4clj.require :as require]
             [js4clj.utils :refer [js. js.. js.- clj->js js->clj]]))
 
+(deftest require-test
+  (testing ""
+    (require/require-js '["luxon" :as lux]
+                        '["luxon" :as lux2])
+    (is (resolve 'lux/DateTime))
+    (is (resolve 'lux2/DateTime))))
+
 (deftest a-test
   (testing "FIXME, I fail."
     (is (= (:as (#'require/parse-flags '[:as name]))
@@ -13,7 +20,7 @@
     (is (let [{:keys [f1 f2 f3 f4 load-ns as]} (#'require/parse-flags '[:f1 :f2 :load-ns :as name :f3 :f4])]
           (and f1 f2 f3 f4 load-ns (= as 'name))))))
 
-(require/require-js '[luxon :as lux])
+(require/require-js '["luxon" :as lux])
 
 (deftest js-test
   (testing ""
