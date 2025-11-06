@@ -1,0 +1,11 @@
+{:deps true
+ :dev-http {8080 {:roots ["public"]}}
+ :builds {:app
+          {:target :browser
+           :modules {:main {:init-fn js4clj.client/init}}
+           :devtools {:preloads []}
+           :compiler-options {:source-map true}}}
+ :nrepl {:middleware [cider.nrepl/cider-middleware ;; it's advisable to explicitly add this middleware. It's automatically added by shadow-cljs (if available in the classpath), unless `:nrepl {:cider false}`
+                      refactor-nrepl.middleware/wrap-refactor] ;; refactor-nrepl is optional
+         :port 50655} ;; optional - if not specified, a random free port will be used
+ }

@@ -1,5 +1,6 @@
 {:paths ["src" "resources" "example"]
  :deps {org.clojure/clojure {:mvn/version "1.11.1"}
+        thheller/shadow-cljs {:mvn/version "3.2.1"}
         org.graalvm.polyglot/polyglot {:mvn/version "25.0.1"}
         ;; You can't just do with a org.graalvm.polyglot/js 
         ;; as specified in the graaljs documentation

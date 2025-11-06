@@ -9,6 +9,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "luxon": "^3.7.2"
+    "crypto-browserify": "^3.12.1",
+    "events": "^3.3.0",
+    "luxon": "^3.7.2",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "shadow-cljs": "^3.2.1",
+    "source-map-support": "^0.5.21",
+    "stream-browserify": "^3.0.0",
+    "util": "^0.12.5"
   }
 }
