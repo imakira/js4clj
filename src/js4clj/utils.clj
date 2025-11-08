@@ -61,7 +61,6 @@
                        (.getMember obj (first keys))))
               (rest keys))))))
 
-
 (defn clj->js [obj]
   (cond (or (set? obj)
             (vector? obj)
@@ -85,7 +84,6 @@
 
 (defn js->clj [^org.graalvm.polyglot.Value value & {:keys [keywordize-keys] :or {keywordize-keys false}}]
   (let [f (fn thisfn [^org.graalvm.polyglot.Value value]
-            #dbg!
             (cond (polyglot-primitive-type? value)
                   (polyglot-primitive->-clj value)
 

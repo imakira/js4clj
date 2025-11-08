@@ -1,11 +1,22 @@
 (ns js4clj.core
   (:require [js4clj.context :refer [*context*]]))
 
-(defn polyglotalize-clojure [value]
-  (-> *context*
-      (.asValue value)))
-
 (declare clojurify-value)
+
+;;TODO what about /this/
+(defn wrap-clojure-fn [f]
+  (reify org.graalvm.polyglot.proxy.ProxyExecutable
+    #_{:clj-kondo/ignore [:unused-binding]}
+    (execute [this ^"[Lorg.graalvm.polyglot.Value;" values]
+      (apply f (map clojurify-value values)))))
+
+(defn polyglotalize-clojure [value]
+  (cond (fn? value)
+        (wrap-clojure-fn value)
+
+        :else
+        (.asValue *context* value)))
+
 
 (defn wrap-polyglot-execute [^org.graalvm.polyglot.Value obj]
   (fn [& args]
