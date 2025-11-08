@@ -1,6 +1,7 @@
 (ns js4clj.js4clj-test
   (:require [clojure.test :refer :all]
             [js4clj.require :as require]
+            [js4clj.js :as js]
             [js4clj.utils :refer [js. js.. js.- clj->js js->clj]]))
 
 (deftest require-test
@@ -29,11 +30,25 @@
              2017)))))
 
 (deftest clj->js-test
-  (let [dt (js. lux/DateTime fromObject
-             (clj->js {:year 2012 :day 22 :hour 12})
-             (clj->js {:zone "America/Los_Angeles"
-                       :numberingSystem "beng"}))]
-    (is (= (:year (:c (js->clj dt :keywordize-keys true)))
-           2012))
-    (is (= (:year (:c (js->clj dt :keywordize-keys true)))
-           2012))))
+  (testing ""
+    (let [dt (js. lux/DateTime fromObject
+               (clj->js {:year 2012 :day 22 :hour 12})
+               (clj->js {:zone "America/Los_Angeles"
+                         :numberingSystem "beng"}))]
+      (is (= (:year (:c (js->clj dt :keywordize-keys true)))
+             2012))
+      (is (= (:year (:c (js->clj dt :keywordize-keys true)))
+             2012)))))
+
+(deftest test-pass-clojure-fn
+  (testing ""
+    (let [testing-vec [1 2 3 4 5 6]
+          double (fn [x & _] (* x 2))
+          sum-of-two (fn [a b & _] (+ a b))]
+      (is (= (js->clj
+              (js. (clj->js testing-vec) map
+                double))
+             (map double testing-vec)))
+
+      (is (= (js. (clj->js testing-vec) reduce sum-of-two 0)
+             (reduce sum-of-two 0 testing-vec))))))
