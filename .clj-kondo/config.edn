@@ -1,0 +1,1 @@
+{:lint-as {js4clj.react-wrapper/defcomp clojure.core/defn}}
