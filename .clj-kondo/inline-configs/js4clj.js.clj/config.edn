@@ -1,1 +1,1 @@
-{:config-in-call {js4clj.js/define-builtins {:ignore [:unresolved-symbol :type-mismatch]}}}
+{:lint-as {js4clj.js/define-builtins clojure.core/declare}}

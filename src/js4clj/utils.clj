@@ -7,15 +7,15 @@
   ;; TODO
   {:clj-kondo/ignore [:unresolved-symbol :type-mismatch]}
   [obj method & args]
-  `((if (.canInvokeMember ~obj ~(str method))
+  `((if (core/can-invoke-member ~obj ~(str method))
       (wrap-polyglot-invoke-member ~obj ~(str method))
-      (wrap-polyglot-execute (.getMember ~obj ~(str method))))
+      (wrap-polyglot-executable (get-member ~obj ~(str method))))
     ~@args))
 
 (defmacro js.-
   {:clj-kondo/ignore [:unresolved-symbol :type-mismatch]}
   [obj field]
-  `(#'clojurify-value (.getMember ~obj ~(str field))))
+  `(#'clojurify-value (get-member ~obj ~(str field))))
 
 #_{:clj-kondo/ignore [:syntax]}
 (defmacro js..
@@ -87,10 +87,10 @@
             (cond (polyglot-primitive-type? value)
                   (polyglot-primitive->-clj value)
 
-                  (javascript-simple-function? value)
-                  (wrap-polyglot-execute value)
+                  (js-fn? value)
+                  (wrap-polyglot-executable value)
 
-                  (array? value)
+                  (js-array? value)
                   (polyglot-iterable->vector value thisfn)
 
                   :else

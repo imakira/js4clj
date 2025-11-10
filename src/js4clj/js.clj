@@ -10,7 +10,7 @@
           (clojurify-value (.eval *context* "js" primitive))))
 
 (defmacro define-builtins
-  {:clj-kondo/ignore [:unresolved-symbol :type-mismatch]}
+  {:clj-kondo/lint-as 'clojure.core/declare}
   [ns & primitives]
   (create-ns ns)
   `(doseq [primitive# '~primitives]

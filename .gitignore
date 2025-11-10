@@ -290,4 +290,4 @@ dist
 
 
 .shadow-cljs
-public/js
+public/js/
