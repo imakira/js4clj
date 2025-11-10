@@ -1,6 +1,8 @@
 (ns js4clj.js4clj-test
+  #_{:clj-kondo/ignore [:refer-all]}
   (:require [clojure.test :refer :all]
             [js4clj.require :as require]
+            [js4clj.core :as core]
             [js4clj.js :as js]
             [js4clj.utils :refer [js. js.. js.- clj->js js->clj]]))
 
@@ -29,6 +31,14 @@
       (is (= (js.- test-dt year)
              2017)))))
 
+(deftest wrapper-method-test
+  (testing ""
+    (is (function? js/Array))
+    (is (= (core/get-meta-qualified-name (core/get-meta-object js/Array))
+           "Function"))
+    (is (= (core/get-meta-qualified-name (core/get-meta-object (core/get-member js/Array "from")))
+           "Function"))))
+
 (deftest clj->js-test
   (testing ""
     (let [dt (js. lux/DateTime fromObject
@@ -40,7 +50,7 @@
       (is (= (:year (:c (js->clj dt :keywordize-keys true)))
              2012)))))
 
-(deftest test-pass-clojure-fn
+(deftest pass-clojure-fn-test
   (testing ""
     (let [testing-vec [1 2 3 4 5 6]
           double (fn [x & _] (* x 2))
@@ -52,3 +62,15 @@
 
       (is (= (js. (clj->js testing-vec) reduce sum-of-two 0)
              (reduce sum-of-two 0 testing-vec))))))
+
+(deftest executable-javascript-object-test
+  (testing ""
+    (is (function? js/Array) "It is a clojure function")
+    (is (core/js-fn? js/Array) "It is also a javascript function")
+    (is (core/can-instantiate js/Array)  "We can also instantiate it")
+    (is (core/get-member js/Array "from") "We can get its static method")
+    (is (= (js->clj (js. js/Array from (clj->js [1 2 3])))
+           [1 2 3]) "We can also call its static method")
+    (is (= (core/js-type js/Array)
+           "Function") "We can get its js type")))
+
