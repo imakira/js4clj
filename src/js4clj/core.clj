@@ -71,30 +71,6 @@
   (fn [& args]
     (clojurify-value (apply invoke-member obj method (map polyglotalize-clojure args)))))
 
-(defn polyglot-primitive-type? [^org.graalvm.polyglot.Value obj]
-  (or (.isBoolean obj)
-      (.isNull obj)
-      (.isString obj)
-      (.isNumber obj)))
-
-(defn polyglot-primitive->-clj [^org.graalvm.polyglot.Value obj]
-  (assert polyglot-primitive-type? obj)
-  (cond (.isBoolean obj)
-        (.asBoolean obj)
-
-        (.isNull obj)
-        nil
-
-        (.isString obj)
-        (.asString obj)
-
-        (.isNumber obj)
-        (cond (.fitsInLong obj)
-              (.asLong obj)
-
-              (.fitsInDouble obj)
-              (.asDouble obj))))
-
 (defn js-fn? [obj]
   (and (get-meta-object obj) (= (get-meta-qualified-name (get-meta-object obj))
                                 "Function")))
@@ -105,6 +81,14 @@
 
 (defn js-type [obj]
   (and (get-meta-object obj) (get-meta-qualified-name (get-meta-object obj))))
+(defn clojurify? [^org.graalvm.polyglot.Value value]
+  (or (.isBoolean value)
+      (.isNull value)
+      (.isString value)
+      (.isNumber value)
+      (.canExecute value)
+      (.isHostObject value)
+      (.isProxyObject value)))
 
 (defn clojurify-value [^org.graalvm.polyglot.Value value]
   (cond (.isBoolean value)
@@ -125,6 +109,15 @@
 
         (.canExecute value) 
         (wrap-polyglot-executable value)
+
+        (.isHostObject value)
+        (.asHostObject value)
+
+        (.isProxyObject value)
+        (let [prox-obj (.asProxyObject value)]
+          (if (::raw-fn (meta prox-obj))
+            (::raw-fn (meta prox-obj))
+            prox-obj))
 
         ;; TODO
         ;; polyglot time, date, time zone, instant, duration

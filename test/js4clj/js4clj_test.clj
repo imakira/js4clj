@@ -48,7 +48,28 @@
       (is (= (:year (:c (js->clj dt :keywordize-keys true)))
              2012))
       (is (= (:year (:c (js->clj dt :keywordize-keys true)))
-             2012)))))
+             2012))))
+
+  (testing ""
+    (is (isa? (class (clj->js nil))
+              org.graalvm.polyglot.Value))
+    (is (isa? (class (clj->js 0))
+              org.graalvm.polyglot.Value))
+    (is (isa? (class (clj->js (fn [])))
+              org.graalvm.polyglot.Value)))
+
+  (testing "Testing wrapped clojure fn"
+    (is (isa? (class (clj->js (fn [])))
+              org.graalvm.polyglot.Value))
+    (is (fn? (js->clj (clj->js (fn [])))))
+
+    (is (= ((js->clj (clj->js +)) 1 2 3)
+           6)))
+
+  (testing "Testing unwrapped host java obj"
+    (is (isa? (class (clj->js {}))
+              org.graalvm.polyglot.Value))
+    (is (map? (js->clj (clj->js {}))))))
 
 (deftest pass-clojure-fn-test
   (testing ""
