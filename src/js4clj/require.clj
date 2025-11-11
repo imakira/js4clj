@@ -1,6 +1,8 @@
 (ns js4clj.require
-  (:require [js4clj.context :refer [*context*]]
-            [js4clj.core :refer :all]))
+  (:require
+   [clojure.string :as s]
+   [js4clj.context :refer [*context*]]
+   [js4clj.core :refer :all]))
 
 (defn- require-module [name]
   (let  [module (-> *context*
@@ -23,12 +25,15 @@
           (recur (rest rst)
                  (assoc result curr (first rst))))))))
 
+(defn- normalize-module-name [name]
+  (s/replace (str name) #"/" "."))
+
 (defn require-js
   [[module-name & flags] & coll]
   (let [flag-map (parse-flags flags)
         module (require-module module-name)
         alias-name (:as flag-map)
-        qualified-module-name (symbol (str "js4clj.modules." module-name))]
+        qualified-module-name (symbol (str "js4clj.modules." (normalize-module-name module-name)))]
     (create-ns qualified-module-name)
     (doseq [k (.getMemberKeys module)]
       (intern qualified-module-name
