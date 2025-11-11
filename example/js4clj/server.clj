@@ -7,5 +7,4 @@
 ;; I know it doesn't look like the brightest idea
 (require-js '["react-dom/cjs/react-dom-server-legacy.browser.development" :as dom-server])
 
-
-(dom-server/renderToString (home))
+(dom-server/renderToString (react/createElement home))

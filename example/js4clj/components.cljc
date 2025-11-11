@@ -9,7 +9,7 @@
   (r "button" {:onClick incr}
      "incr"))
 
-(defn home []
+(defcomp home []
   (let [[count set-count!] (use-state 1)]
     (r "div" {}
        (r "h1" {:className "class"}
