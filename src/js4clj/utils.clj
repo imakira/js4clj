@@ -80,23 +80,30 @@
             (.putMember js-obj (clj->js k) (clj->js v)))
           js-obj)
 
-        :else obj))
+        :else
+        ;; extract js4clj.core/raw-value from obj if exists
+        ;; wrap fn if (fn? obj)
+        ;; https://www.graalvm.org/sdk/javadoc/org/graalvm/polyglot/Context.html#asValue(java.lang.Object)
+        ;; for polyglot's builtin types
+        (polyglotalize-clojure obj)))
 
-(defn js->clj [^org.graalvm.polyglot.Value value & {:keys [keywordize-keys] :or {keywordize-keys false}}]
-  (let [f (fn thisfn [^org.graalvm.polyglot.Value value]
-            (cond (polyglot-primitive-type? value)
-                  (polyglot-primitive->-clj value)
+(defn js->clj [value & {:keys [keywordize-keys] :or {keywordize-keys false}}]
+  (if (not (isa? (class value) org.graalvm.polyglot.Value))
+    ;; if it is not a js obj, return as is
+    value
+    (let [f (fn thisfn [^org.graalvm.polyglot.Value value]
+              (cond
+                ;; for: boolean null string number executable
+                (clojurify? value)
+                (clojurify-value value)
 
-                  (js-fn? value)
-                  (wrap-polyglot-executable value)
+                (js-array? value)
+                (polyglot-iterable->vector value thisfn)
 
-                  (js-array? value)
-                  (polyglot-iterable->vector value thisfn)
-
-                  :else
-                  (polyglot-object->map value
-                                        :key-fn (if keywordize-keys
-                                                  keyword
-                                                  identity)
-                                        :value-fn thisfn)))]
-    (f value)))
+                :else
+                (polyglot-object->map value
+                                      :key-fn (if keywordize-keys
+                                                keyword
+                                                identity)
+                                      :value-fn thisfn)))]
+      (f value))))

@@ -39,6 +39,25 @@
     (is (= (core/get-meta-qualified-name (core/get-meta-object (core/get-member js/Array "from")))
            "Function"))))
 
+(deftest null-undefined-test
+  (testing ""
+    (is (core/js-undefined? js/undefined))
+    (is (false? (core/js-undefined? nil)))
+    (is (false? (core/js-undefined? (clj->js nil))))))
+
+(deftest js->clj-test
+  (testing "Default testing"
+    (is (nil? (js->clj js/undefined)))
+    (is (fn? (js->clj js/Array))))
+
+  (testing "Testing builitn types, they should be returned as is"
+    (is (nil? (js->clj nil)))
+    (is (= (js->clj 0) 0))
+    (is (= (js->clj {:a 1})
+           {:a 1}))
+    (is (= (js->clj [1 2 3])
+           [1 2 3]))))
+
 (deftest clj->js-test
   (testing ""
     (let [dt (js. lux/DateTime fromObject
@@ -91,7 +110,5 @@
     (is (core/can-instantiate js/Array)  "We can also instantiate it")
     (is (core/get-member js/Array "from") "We can get its static method")
     (is (= (js->clj (js. js/Array from (clj->js [1 2 3])))
-           [1 2 3]) "We can also call its static method")
-    (is (= (core/js-type js/Array)
-           "Function") "We can get its js type")))
+           [1 2 3]) "We can also call its static method")))
 

@@ -1,7 +1,7 @@
 (ns js4clj.core
   (:require [js4clj.context :refer [*context*]]
             [clojure.string :as string])
-  (:import (org.graalvm.polyglot Value)))
+  (:import (org.graalvm.polyglot Value Context)))
 
 (declare clojurify-value)
 
@@ -22,6 +22,7 @@
         (wrap-clojure-fn value)
 
         :else
+        ;; https://www.graalvm.org/sdk/javadoc/org/graalvm/polyglot/Context.html#asValue(java.lang.Object)
         (.asValue *context* value)))
 
 (defn unwrap-polyglot-executable [f]
@@ -79,8 +80,14 @@
   (= (get-meta-qualified-name (get-meta-object obj))
      "Array"))
 
-(defn js-type [obj]
-  (and (get-meta-object obj) (get-meta-qualified-name (get-meta-object obj))))
+(defn js-undefined? [obj]
+  (and (isa? (class obj) org.graalvm.polyglot.Value)
+       (boolean
+        (some-> obj
+                get-meta-object
+                get-meta-qualified-name
+                (= "undefined")))))
+
 (defn clojurify? [^org.graalvm.polyglot.Value value]
   (or (.isBoolean value)
       (.isNull value)
