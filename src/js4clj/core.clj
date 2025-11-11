@@ -7,10 +7,12 @@
 
 ;;TODO what about /this/
 (defn wrap-clojure-fn [f]
-  (reify org.graalvm.polyglot.proxy.ProxyExecutable
-    #_{:clj-kondo/ignore [:unused-binding]}
-    (execute [this ^"[Lorg.graalvm.polyglot.Value;" values]
-      (apply f (map clojurify-value values)))))
+  (.asValue *context*
+            (with-meta (reify org.graalvm.polyglot.proxy.ProxyExecutable
+                         #_{:clj-kondo/ignore [:unused-binding]}
+                         (execute [this ^"[Lorg.graalvm.polyglot.Value;" values]
+                           (apply f (map clojurify-value values))))
+              {::raw-fn f})))
 
 (defn polyglotalize-clojure [value]
   (cond (::raw-value (meta value))
