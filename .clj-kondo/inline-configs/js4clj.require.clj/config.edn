@@ -1,0 +1,1 @@
+{:lint-as {js4clj.require/require-js clojure.core/require}}

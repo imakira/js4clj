@@ -29,6 +29,7 @@
   (s/replace (str name) #"/" "."))
 
 (defn require-js
+  {:clj-kondo/lint-as 'clojure.core/require}
   [[module-name & flags] & coll]
   (let [flag-map (parse-flags flags)
         module (require-module module-name)
