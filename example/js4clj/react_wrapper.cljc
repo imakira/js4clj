@@ -33,7 +33,6 @@
        ~@body)))
 
 (defn r [comp & [attrs & children]]
-  #dbg!
   (apply react/createElement comp
          (clj->js attrs)
          children))
