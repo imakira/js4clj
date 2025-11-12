@@ -6,7 +6,10 @@
 
 
 (defn init []
-  (-> (js/document.getElementById
-       "root")
-      (dom-client/createRoot)
-      (.render (react/createElement components/home))))
+  (let [root (js/document.getElementById
+              "root")
+        home (react/createElement components/home)]
+    (if js/window.__js4clj_ssr
+      (dom-client/hydrateRoot root home)
+      (.render (dom-client/createRoot root)
+               home))))
