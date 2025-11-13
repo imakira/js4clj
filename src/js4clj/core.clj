@@ -33,6 +33,13 @@
   (string/replace s #"-([a-z])" (fn [g]
                                   (.toUpperCase (second g)))))
 
+
+(defn polyglot-value [obj]
+  (or (::raw-value (meta obj))
+      (and (isa? (class obj)
+                 org.graalvm.polyglot.Value)
+           obj)))
+
 (defmacro define-unwrap-executable-alias
   {:clj-kondo/lint-as 'clojure.core/declare}
   [name & args]
@@ -42,7 +49,7 @@
         obj 'obj
         [arglist [_ vararg]] (split-with (fn [x] (not (= x '&))) args)] 
     `(defn ~name {:doc ~docstring} [~obj ~@arglist ~@(if vararg `[& ~vararg] [])]
-       (let [~obj (or (unwrap-polyglot-executable ~obj)
+       (let [~obj (or (polyglot-value ~obj)
                       ~obj)]
          (~(symbol (str "." (to-camel-style (str name))))
           ~obj 
@@ -69,15 +76,18 @@
                (clojurify-value (.execute obj (into-array Object (map polyglotalize-clojure args)))))
     {::raw-value obj}))
 
-
-
 (defn js-fn? [obj]
-  (and (get-meta-object obj) (= (get-meta-qualified-name (get-meta-object obj))
-                                "Function")))
+  (and (get-meta-object obj)
+       (= (get-meta-qualified-name (get-meta-object obj))
+          "Function")))
 
-(defn js-array? [^org.graalvm.polyglot.Value obj]
-  (= (get-meta-qualified-name (get-meta-object obj))
-     "Array"))
+(defn js-array? [obj]
+  (boolean (and
+            (polyglot-value obj)
+            (some-> obj
+                    get-meta-object
+                    get-meta-qualified-name
+                    (= "Array")))))
 
 (defn js-undefined? [obj]
   (and (isa? (class obj) org.graalvm.polyglot.Value)

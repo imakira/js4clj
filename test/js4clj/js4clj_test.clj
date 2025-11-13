@@ -45,6 +45,19 @@
     (is (false? (core/js-undefined? nil)))
     (is (false? (core/js-undefined? (clj->js nil))))))
 
+(deftest polyglot-value?-test
+  (testing ""
+    (is (true? (fn? js/Array)) "js/Array is a clojure fn")
+    (is (boolean (core/polyglot-value js/Array)) "js/Array is also a polyglot value")
+    (is (isa? (class (core/polyglot-value js/Array))
+              org.graalvm.polyglot.Value) "It returns the wrapped Value")))
+
+(deftest js-array?-test
+  (testing ""
+    (is (true? (core/js-array? (clj->js [1 2 3]))) "it is a js array")
+    (is (false? (core/js-array? nil)) "returns false, no error threw")
+    (is (false? (core/js-array? js/undefined)) "returns false, no error threw")))
+
 (deftest js->clj-test
   (testing "Default testing"
     (is (nil? (js->clj js/undefined)))
