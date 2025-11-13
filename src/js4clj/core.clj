@@ -26,9 +26,6 @@
         ;; https://www.graalvm.org/sdk/javadoc/org/graalvm/polyglot/Context.html#asValue(java.lang.Object)
         (.asValue *context* value)))
 
-(defn unwrap-polyglot-executable [f]
-  (::raw-value (meta f)))
-
 (defn- to-camel-style [s]
   (string/replace s #"-([a-z])" (fn [g]
                                   (.toUpperCase (second g)))))
@@ -36,8 +33,7 @@
 
 (defn polyglot-value [obj]
   (or (::raw-value (meta obj))
-      (and (isa? (class obj)
-                 org.graalvm.polyglot.Value)
+      (and (instance? org.graalvm.polyglot.Value obj)
            obj)))
 
 (defmacro define-unwrap-executable-alias
@@ -90,7 +86,7 @@
                     (= "Array")))))
 
 (defn js-undefined? [obj]
-  (and (isa? (class obj) org.graalvm.polyglot.Value)
+  (and (instance? org.graalvm.polyglot.Value obj)
        (boolean
         (some-> obj
                 get-meta-object
