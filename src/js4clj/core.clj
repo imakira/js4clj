@@ -69,9 +69,7 @@
                (clojurify-value (.execute obj (into-array Object (map polyglotalize-clojure args)))))
     {::raw-value obj}))
 
-(defn wrap-polyglot-invoke-member [^org.graalvm.polyglot.Value obj ^String method]
-  (fn [& args]
-    (clojurify-value (apply invoke-member obj method (map polyglotalize-clojure args)))))
+
 
 (defn js-fn? [obj]
   (and (get-meta-object obj) (= (get-meta-qualified-name (get-meta-object obj))

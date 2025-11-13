@@ -7,10 +7,10 @@
   ;; TODO
   {:clj-kondo/ignore [:unresolved-symbol :type-mismatch]}
   [obj method & args]
-  `((if (core/can-invoke-member ~obj ~(str method))
-      (wrap-polyglot-invoke-member ~obj ~(str method))
-      (wrap-polyglot-executable (get-member ~obj ~(str method))))
-    ~@args))
+  `(clojurify-value
+    (apply invoke-member ~obj ~(str method)
+           ;; evaluate args before passing  to polyglotalize-clojure
+           (map polyglotalize-clojure (list ~@args)))))
 
 (defmacro js.-
   {:clj-kondo/ignore [:unresolved-symbol :type-mismatch]}
