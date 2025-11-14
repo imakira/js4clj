@@ -18,7 +18,7 @@
                          '["luxon/build/es6/luxon.mjs" :as elux2])
     (is (resolve 'elux/DateTime))
     (is (resolve 'elux2/DateTime))
-    (is (string? (js.. elux/DateTime now toString)))))
+    (is (string? (js.. (var-get (resolve 'elux/DateTime)) now toString)))))
 
 (deftest a-test
   (testing "FIXME, I fail."
