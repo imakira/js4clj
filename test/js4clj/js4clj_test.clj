@@ -4,7 +4,7 @@
             [js4clj.require :as require]
             [js4clj.core :as core]
             [js4clj.js :as js]
-            [js4clj.utils :refer [js. js.. js.- clj->js js->clj]]))
+            [js4clj.utils :refer [js. js.. js.- js-set! clj->js js->clj js-new]]))
 
 (deftest require-test
   (testing "Requiring commonjs modules test"
@@ -77,6 +77,21 @@
            {:a 1}))
     (is (= (js->clj [1 2 3])
            [1 2 3]))))
+
+(deftest js-set!-test
+  (testing ""
+    (let [obj (clj->js {:level1 {:level2 {:key nil}}})]
+      (js-set! (js.. obj -level1 -level2 -key) 1)
+      (is (= 1 (js.. obj -level1 -level2 -key)))
+      (js-set! (js.- (js.. obj -level1 -level2)
+                     key)
+               2)
+      (is (= 2 (js.. obj -level1 -level2 -key))))))
+
+(deftest js-new-test
+  (testing ""
+    (is (= (js->clj (js-new js/Array 1 2 3 4))
+           [1 2 3 4]))))
 
 (deftest clj->js-test
   (testing ""
