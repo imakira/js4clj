@@ -1,16 +1,22 @@
 (ns js4clj.require
   (:require
+   [clojure.java.io :as io]
    [clojure.string :as s]
    [js4clj.context :refer [*context*]]
    [js4clj.core :refer :all]))
 
-(defn- require-module [name]
+(defn- require-commjs-module [name]
   (let  [module (-> *context*
                     (.eval "js"
                            (str "require('" name "')")))]
     (assert (.hasMembers module)
             (str name " is not a module"))
     module))
+
+(defn- require-esm-module [path]
+  (let [url (io/resource (str path))
+        source (.build (org.graalvm.polyglot.Source/newBuilder "js" url))]
+    (.eval *context* source)))
 
 (defn- parse-flags [args]
   (loop [args (lazy-seq args)
@@ -28,19 +34,35 @@
 (defn- normalize-module-name [name]
   (s/replace (str name) #"/" "."))
 
+(defn- internal-module [^org.graalvm.polyglot.Value module qualified-module-name & [alias-name]]
+  (create-ns qualified-module-name)
+  (doseq [k (.getMemberKeys module)]
+    (intern qualified-module-name
+            (symbol k)
+            (clojurify-value (.getMember module k))))
+  (when alias-name
+    (alias alias-name qualified-module-name)))
+
 (defn require-js
   {:clj-kondo/lint-as 'clojure.core/require}
-  [[module-name & flags] & coll]
-  (let [flag-map (parse-flags flags)
-        module (require-module module-name)
-        alias-name (:as flag-map)
-        qualified-module-name (symbol (str "js4clj.modules." (normalize-module-name module-name)))]
-    (create-ns qualified-module-name)
-    (doseq [k (.getMemberKeys module)]
-      (intern qualified-module-name
-              (symbol k)
-              (clojurify-value (.getMember module k))))
-    (when alias-name
-      (alias alias-name qualified-module-name)))
-  (when (seq coll)
-    (apply require-js coll)))
+  ([[module-name & flags]]
+   (let [flag-map (parse-flags flags)
+         module (require-commjs-module module-name)
+         alias-name (:as flag-map)
+         qualified-module-name (symbol (str "js4clj.modules." (normalize-module-name module-name)))]
+     (internal-module module qualified-module-name alias-name)))
+  ([curr & colls]
+   (require-js curr)
+   (when colls (apply require-js colls))))
+
+(defn require-esm
+  {:clj-kondo/lint-as 'clojure.core/require}
+  ([[module-name & flags]]
+   (let [flag-map (parse-flags flags)
+         module (require-esm-module module-name)
+         alias-name (:as flag-map)
+         qualified-module-name (symbol (str "js4clj.esmodules." (normalize-module-name module-name)))]
+     (internal-module module qualified-module-name alias-name)))
+  ([curr & colls]
+   (require-esm curr)
+   (when colls (apply require-esm colls))))

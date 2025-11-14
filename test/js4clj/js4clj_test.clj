@@ -7,11 +7,18 @@
             [js4clj.utils :refer [js. js.. js.- clj->js js->clj]]))
 
 (deftest require-test
-  (testing ""
+  (testing "Requiring commonjs modules test"
     (require/require-js '["luxon" :as lux]
                         '["luxon" :as lux2])
     (is (resolve 'lux/DateTime))
-    (is (resolve 'lux2/DateTime))))
+    (is (resolve 'lux2/DateTime)))
+
+  (testing "Requiring esm modules test"
+    (require/require-esm '["luxon/build/es6/luxon.mjs" :as elux]
+                         '["luxon/build/es6/luxon.mjs" :as elux2])
+    (is (resolve 'elux/DateTime))
+    (is (resolve 'elux2/DateTime))
+    (is (string? (js.. elux/DateTime now toString)))))
 
 (deftest a-test
   (testing "FIXME, I fail."
