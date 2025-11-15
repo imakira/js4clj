@@ -10,7 +10,7 @@
 (defn- define-builtin [ns primitive & [alias]]
   (intern ns (if alias (symbol alias) (symbol primitive))
           ((if *no-clojurify* identity clojurify-value)
-           (.eval *context* "js" primitive))))
+           (.getMember (.getBindings *context* "js") primitive))))
 
 (defmacro define-builtins
   {:clj-kondo/lint-as 'clojure.core/declare}
@@ -27,6 +27,7 @@
 (with-bindings {#'*no-clojurify* true}
   (define-builtin 'js4clj.js "undefined" "undefined"))
 
+#_{:clojure-lsp/ignore [:clojure-lsp/unused-public-var]}
 (define-builtins js4clj.js
   globalThis
   Infinity
@@ -54,4 +55,4 @@
 (defn builtin [name]
   ((if *no-clojurify* identity
        clojurify-value)
-   (.eval *context* "js" name)))
+   (.getMember (.getBindings *context* "js") name)))
