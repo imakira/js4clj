@@ -67,6 +67,9 @@
 (define-unwrap-executable-alias can-invoke-member [^String s])
 (define-unwrap-executable-alias invoke-member [^String method & args])
 (define-unwrap-executable-alias can-instantiate)
+(define-unwrap-executable-alias canExecute)
+(define-unwrap-executable-alias execute [& args])
+(define-unwrap-executable-alias executeVoid [& args])
 
 (defn wrap-polyglot-executable [^org.graalvm.polyglot.Value obj]
   (with-meta (fn [& args]
