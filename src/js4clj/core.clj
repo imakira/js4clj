@@ -107,7 +107,16 @@
       (.isProxyObject value)))
 
 (defn clojurify-value [^org.graalvm.polyglot.Value value]
-  (cond (.isBoolean value)
+  (cond (.isProxyObject value)
+        (let [prox-obj (.asProxyObject value)]
+          (if (::raw-fn (meta prox-obj))
+            (::raw-fn (meta prox-obj))
+            prox-obj))
+
+        (.isHostObject value)
+        (.asHostObject value)
+
+        (.isBoolean value)
         (.asBoolean value)
 
         (.isNull value)
@@ -125,16 +134,6 @@
 
         (.canExecute value) 
         (wrap-polyglot-executable value)
-
-        (.isHostObject value)
-        (.asHostObject value)
-
-        (.isProxyObject value)
-        (let [prox-obj (.asProxyObject value)]
-          (if (::raw-fn (meta prox-obj))
-            (::raw-fn (meta prox-obj))
-            prox-obj))
-
         ;; TODO
         ;; polyglot time, date, time zone, instant, duration
         :else

@@ -4,6 +4,7 @@
             [js4clj.require :as require]
             [js4clj.core :as core]
             [js4clj.js :as js]
+            [js4clj.context :refer [*context*]]
             [js4clj.utils :refer [js. js.. js.- js-set! clj->js js->clj js-new]]))
 
 (deftest require-test
@@ -118,7 +119,12 @@
     (is (fn? (js->clj (clj->js (fn [])))))
 
     (is (= ((js->clj (clj->js +)) 1 2 3)
-           6)))
+           6))
+
+    (let [double (fn [x] (* 2 x))
+          js-identity (.eval *context* "js" "(function (x) {return x;})")
+          js-identity-wrapped (core/clojurify-value js-identity)]
+      (is (= double (js-identity-wrapped double)))))
 
   (testing "Testing unwrapped host java obj"
     (is (isa? (class (clj->js {}))
