@@ -111,18 +111,20 @@
 (defn js-new [class & args]
   (apply instantiate class args))
 
-(defmacro js-set! [[op & args] value]
-  (assert (or (not (= op 'js..))
-              (not (= op 'js.-)))
-          "First argument to js-set! must start with either `js..` or `js.-`")
-  (let [remove-hyphen (= op 'js..)
-        lst (last args)
-        last-removed (drop-last (into [op] args))]
-    `(put-member ~(if (= (count last-removed) 2)
-                    (second last-removed)
-                    last-removed)
-                 ~(if remove-hyphen
-                    (subs (str lst) 1)
-                    (str lst))
-                 ~value)))
+(defmacro js-set! [dot-form value]
+  (assert (seq? dot-form) "First argument must be in the form of `(js.. obj -field)` or (js.- obj field)")
+  (let [[op & args] dot-form]
+    (assert (or (= op 'js..)
+                (= op 'js.-))
+            "First argument to js-set! must start with either `js..` or `js.-`")
+    (let [remove-hyphen (= op 'js..)
+          lst (last args)
+          last-removed (drop-last (into [op] args))]
+      `(put-member ~(if (= (count last-removed) 2)
+                      (second last-removed)
+                      last-removed)
+                   ~(if remove-hyphen
+                      (subs (str lst) 1)
+                      (str lst))
+                   ~value))))
 
