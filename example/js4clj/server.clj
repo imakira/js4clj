@@ -1,15 +1,15 @@
 (ns js4clj.server
   (:require [hiccup2.core :as h]
             [hiccup.util :refer [raw-string]]
-            [js4clj.require :refer [require-js]]
+            [js4clj.require :refer [require-cjs]]
             [js4clj.components :as comps]
             [ring.adapter.jetty :as jetty]
             [ring.middleware.file :refer [wrap-file]]))
 
-(require-js '["react-dom/client" :as dom-client])
-(require-js '["react" :as react])
+(require-cjs '["react-dom/client" :as dom-client])
+(require-cjs '["react" :as react])
 ;; I know it doesn't look like the brightest idea
-(require-js '["react-dom/cjs/react-dom-server-legacy.browser.development" :as dom-server])
+(require-cjs '["react-dom/cjs/react-dom-server-legacy.browser.development" :as dom-server])
 
 (defn template [content]
   (str

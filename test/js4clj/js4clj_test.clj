@@ -8,15 +8,19 @@
             [js4clj.utils :refer [js. js.. js.- js-set! clj->js js->clj js-new]]))
 
 (deftest require-test
+
+  (testing "Generic Require Test"
+    (require/require-js '["luxon" :as grt-lux])
+    (is (resolve 'grt-lux/DateTime)))
   (testing "Requiring commonjs modules test"
-    (require/require-js '["luxon" :as lux]
-                        '["luxon" :as lux2])
+    (require/require-cjs '["luxon" :as lux]
+                         '["luxon" :as lux2])
     (is (resolve 'lux/DateTime))
     (is (resolve 'lux2/DateTime)))
 
   (testing "Requiring esm modules test"
-    (require/require-esm '["luxon/build/es6/luxon.mjs" :as elux]
-                         '["luxon/build/es6/luxon.mjs" :as elux2])
+    (require/require-esm '["node_modules/luxon/build/es6/luxon.mjs" :as elux]
+                         '["node_modules/luxon/build/es6/luxon.mjs" :as elux2])
     (is (resolve 'elux/DateTime))
     (is (resolve 'elux2/DateTime))
     (is (string? (js.. (var-get (resolve 'elux/DateTime)) now toString)))))
@@ -31,7 +35,7 @@
     (is (let [{:keys [f1 f2 f3 f4 load-ns as]} (#'require/parse-flags '[:f1 :f2 :load-ns :as name :f3 :f4])]
           (and f1 f2 f3 f4 load-ns (= as 'name))))))
 
-(require/require-js '["luxon" :as lux])
+(require/require-cjs '["luxon" :as lux])
 
 (deftest js-test
   (testing ""

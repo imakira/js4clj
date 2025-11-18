@@ -1,1 +1,1 @@
-{:lint-as {js4clj.require/require-js clojure.core/require, js4clj.require/require-esm clojure.core/require}}
+{:lint-as {js4clj.require/require-cjs clojure.core/require, js4clj.require/require-esm clojure.core/require, js4clj.require/require-js clojure.core/require}}
