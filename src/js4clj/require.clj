@@ -21,7 +21,9 @@
 
 (defn- require-esm-module [path]
   (let [url (.toURL (io/file path))
-        source (.build (org.graalvm.polyglot.Source/newBuilder "js" url))]
+        source (-> (org.graalvm.polyglot.Source/newBuilder "js" url)
+                   (.mimeType "application/javascript+module")
+                   (.build))]
     (.eval *context* source)))
 
 (defn- parse-flags [args]
