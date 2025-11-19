@@ -292,3 +292,4 @@ dist
 .shadow-cljs
 public/js/
 .dir-locals-2.el
+!NOTES.org

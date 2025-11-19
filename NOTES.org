@@ -1,0 +1,13 @@
+* ESM Module Loading
+
+As stated in [[https://github.com/oracle/graaljs/issues/575][a dicussion in March 2022]], modular loader isn't customizable, the only approch is providing a custom FileSystem
+
+#+begin_quote
+The module loader cannot be customized at the moment. We might introduce such a feature in future versions, but for now the only way to customize module loading is by providing a customized FileSystem.
+#+end_quote
+
+Providing a FileSystem to customize ES modules loading process is also the approch recommanded by [[https://www.graalvm.org/latest/reference-manual/js/Modules/][the documentation]].
+
+#+begin_quote
+By default, GraalJS uses the built-in FileSystem of the polyglot Context to load and resolve ES modules. A FileSystem can be used to customize the ES modules loading process. For example, a custom FileSystem can be used to resolve ES modules using URLs:
+#+end_quote
