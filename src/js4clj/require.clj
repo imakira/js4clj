@@ -2,7 +2,6 @@
   (:require
    [cheshire.core :refer [parse-string]]
    [clojure.java.io :as io]
-   [clojure.string :as s]
    [clojure.string :as string]
    [js4clj.context :refer [*context*]]
    [js4clj.core :refer :all]
@@ -40,7 +39,7 @@
                  (assoc result curr (first rst))))))))
 
 (defn- normalize-module-name [name]
-  (s/replace (str name) #"/" "."))
+  (string/replace (str name) #"/" "."))
 
 (defn- internal-module [^org.graalvm.polyglot.Value module qualified-module-name & [alias-name]]
   (create-ns qualified-module-name)
