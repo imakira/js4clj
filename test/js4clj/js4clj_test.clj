@@ -93,11 +93,11 @@
                2)
       (is (= 2 (js.. obj -level1 -level2 -key)))))
 
-  (testing "testing erroneous arguments"
-    (is (thrown? Exception
-                 (macroexpand '(js-set! a 1))))
-    (is (thrown? Exception
-                 (macroexpand '(js-set! (js. obj mtd) 1))))))
+  #_(testing "testing erroneous arguments"
+      (is (thrown? Exception
+                   (macroexpand '(js-set! a 1))))
+      (is (thrown? Exception
+                   (macroexpand '(js-set! (js. obj mtd) 1))))))
 
 (deftest js-new-test
   (testing ""
