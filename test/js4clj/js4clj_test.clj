@@ -3,9 +3,11 @@
   (:require [clojure.test :refer :all]
             [js4clj.require :as require]
             [js4clj.core :as core]
+            [js4clj.api.converting :as converting]
             [js4clj.js :as js]
+            [js4clj.api.polyglot :as polyglot]
             [js4clj.context :refer [*context*]]
-            [js4clj.utils :refer [js. js.. js.- js-set! clj->js js->clj js-new]]))
+            [js4clj.utils :refer [js. js.. js.- js-set! clj->js js->clj ]]))
 
 (deftest require-test
 
@@ -46,22 +48,22 @@
 (deftest wrapper-method-test
   (testing ""
     (is (function? js/Array))
-    (is (= (core/get-meta-qualified-name (core/get-meta-object js/Array))
+    (is (= (polyglot/get-meta-qualified-name (polyglot/get-meta-object js/Array))
            "Function"))
-    (is (= (core/get-meta-qualified-name (core/get-meta-object (core/get-member js/Array "from")))
+    (is (= (polyglot/get-meta-qualified-name (polyglot/get-meta-object (polyglot/get-member js/Array "from")))
            "Function"))))
 
 (deftest null-undefined-test
   (testing ""
-    (is (core/js-undefined? js/undefined))
-    (is (false? (core/js-undefined? nil)))
-    (is (false? (core/js-undefined? (clj->js nil))))))
+    (is (js/js-undefined? js/undefined))
+    (is (false? (js/js-undefined? nil)))
+    (is (false? (js/js-undefined? (clj->js nil))))))
 
 (deftest polyglot-value?-test
   (testing ""
     (is (true? (fn? js/Array)) "js/Array is a clojure fn")
-    (is (boolean (core/polyglot-value js/Array)) "js/Array is also a polyglot value")
-    (is (isa? (class (core/polyglot-value js/Array))
+    (is (boolean (polyglot/polyglot-value js/Array)) "js/Array is also a polyglot value")
+    (is (isa? (class (polyglot/polyglot-value js/Array))
               org.graalvm.polyglot.Value) "It returns the wrapped Value")))
 
 (deftest js-array?-test
@@ -101,7 +103,7 @@
 
 (deftest js-new-test
   (testing ""
-    (is (= (js->clj (js-new js/Array 1 2 3 4))
+    (is (= (js->clj (core/js-new js/Array 1 2 3 4))
            [1 2 3 4]))))
 
 (deftest clj->js-test
@@ -133,7 +135,7 @@
 
     (let [double (fn [x] (* 2 x))
           js-identity (.eval *context* "js" "(function (x) {return x;})")
-          js-identity-wrapped (core/clojurify-value js-identity)]
+          js-identity-wrapped (converting/clojurify-value js-identity)]
       (is (= double (js-identity-wrapped double)))))
 
   (testing "Testing unwrapped host java obj"
@@ -158,8 +160,8 @@
   (testing ""
     (is (function? js/Array) "It is a clojure function")
     (is (core/js-fn? js/Array) "It is also a javascript function")
-    (is (core/can-instantiate js/Array)  "We can also instantiate it")
-    (is (core/get-member js/Array "from") "We can get its static method")
+    (is (polyglot/can-instantiate js/Array)  "We can also instantiate it")
+    (is (polyglot/get-member js/Array "from") "We can get its static method")
     (is (= (js->clj (js. js/Array from (clj->js [1 2 3])))
            [1 2 3]) "We can also call its static method")))
 

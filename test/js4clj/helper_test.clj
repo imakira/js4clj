@@ -2,7 +2,7 @@
   #_{:clj-kondo/ignore [:refer-all]}
   (:require
    [clojure.test :refer :all]
-   [js4clj.core :as core]))
+   [js4clj.api.converting :as core]))
 
 (deftest core-test
   (testing ""

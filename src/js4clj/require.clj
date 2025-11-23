@@ -4,7 +4,8 @@
    [clojure.java.io :as io]
    [clojure.string :as string]
    [js4clj.context :refer [*context*]]
-   [js4clj.core :refer :all]
+   [js4clj.api.converting :refer :all]
+   [js4clj.api.polyglot :refer :all]
    [js4clj.api.utils :refer [normalize-path-to-string]]
    [clojure.core.async :as a])
   (:import
@@ -48,6 +49,12 @@
     (a/<!! chann)))
 
 (defn require-js
+  "(require-js '[\"module-name\" :alias ns])
+
+  Import a JavaScript module and add its exports to namespace `ns`
+
+  Like node.js, this function finds JavaScript modules from the node_modules directory,
+    it supports ECMAScript modules and legacy CommonJS modules."
   {:clj-kondo/lint-as 'clojure.core/require}
   ([[module-name & flags]]
    (let [flag-map (parse-flags flags)
@@ -55,7 +62,7 @@
          alias-name (:as flag-map)
          qualified-module-name (symbol (str "js4clj.modules." (normalize-module-name module-name)))]
      (internal-module module qualified-module-name alias-name)))
-  ([curr & colls]
-   (require-js curr)
-   (when colls (apply require-js colls))))
+  ([module & args]
+   (require-js module)
+   (when args (apply require-js args))))
 

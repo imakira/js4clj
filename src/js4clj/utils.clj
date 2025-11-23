@@ -1,9 +1,14 @@
 (ns js4clj.utils
-  (:require [js4clj.core :refer :all]
+  (:require [js4clj.api.converting :refer :all]
+            [js4clj.api.polyglot :refer :all]
+            [js4clj.core :refer :all]
             [js4clj.js :as js :refer [builtin]]))
 
 #_{:clj-kondo/ignore [:syntax]}
 (defmacro js.
+  "(js. object method) => object.method()
+
+  Invoke `method` of the object `object`, like the builtin `.`"
   ;; TODO
   {:clj-kondo/ignore [:unresolved-symbol :type-mismatch]}
   [obj method & args]
@@ -13,12 +18,19 @@
            (map polyglotalize-clojure (list ~@args)))))
 
 (defmacro js.-
+  "(js.- object field) => object.field
+
+  Access `field` of the object `object`, like the builtin `.-`
+  "
   {:clj-kondo/ignore [:unresolved-symbol :type-mismatch]}
   [obj field]
   `(#'clojurify-value (get-member ~obj ~(str field))))
 
 #_{:clj-kondo/ignore [:syntax]}
 (defmacro js..
+  "(js.. object -field1 -field2 method) => object.field1.field2.method()
+
+  Chained field access or method invoking of `object`, like the builtin `..`"
   {:clj-kondo/ignore [:unresolved-symbol :type-mismatch]}
   [obj & args]
   (if (empty? args)
@@ -35,8 +47,8 @@
                     `(js. ~obj ~curr#))
          ~@rest#))))
 
-(defn create-js-array [& args]
-  (apply instantiate (builtin "Array") args))
+(defn- create-js-array [& args]
+  (apply js-new (builtin "Array") args))
 
 (defn- polyglot-iterable->vector [^org.graalvm.polyglot.Value obj & [f]]
   (assert (.hasIterator obj))
@@ -61,7 +73,13 @@
                        (.getMember obj (first keys))))
               (rest keys))))))
 
-(defn clj->js [obj]
+(defn clj->js
+  "Convert a Clojure value to a JavaScript one
+
+  `set`/`vector`/`list` -> JavaScript Array
+  `keyword`/symbol -> String
+  `map` -> JavaScript Object "
+  [obj]
   (cond (or (set? obj)
             (vector? obj)
             (list? obj))
@@ -73,21 +91,26 @@
 
         (symbol? obj)
         (str obj)
-        
+
         (map? obj)
-        (let [js-obj (instantiate (builtin "Object"))]
+        (let [js-obj (js-new (builtin "Object"))]
           (doseq [[k v] obj]
             (.putMember js-obj (clj->js k) (clj->js v)))
           js-obj)
 
         :else
-        ;; extract js4clj.core/raw-value from obj if exists
-        ;; wrap fn if (fn? obj)
-        ;; https://www.graalvm.org/sdk/javadoc/org/graalvm/polyglot/Context.html#asValue(java.lang.Object)
-        ;; for polyglot's builtin types
         (polyglotalize-clojure obj)))
 
-(defn js->clj [value & {:keys [keywordize-keys] :or {keywordize-keys false}}]
+(defn js->clj
+  "Recursively convert a JavaScript object to a Clojure value
+
+  With option {:keywordize-keys true} will convert object fields from strings to keywords.
+
+  Converting Table:
+  JavaScript Executable -> Clojure fn
+  JavaScript Array -> Clojure Vector
+  Any JavaScript Object not instantiable or executable -> Clojure Map"
+  [value & {:keys [keywordize-keys] :or {keywordize-keys false}}]
   (if (not (isa? (class value) org.graalvm.polyglot.Value))
     ;; if it is not a js obj, return as is
     value
@@ -108,10 +131,12 @@
                                       :value-fn thisfn)))]
       (f value))))
 
-(defn js-new [class & args]
-  (apply instantiate class args))
+(defmacro js-set!
+  "(js-set! (js.- obj field) value)
+  (js-set! (js.. obj -field) value)
 
-(defmacro js-set! [dot-form value]
+  Set the property of a JavaScript object to `value`, the property is accessed with `js.-` or `js..` in the first parameter"
+  [dot-form value]
   (assert (seq? dot-form) "First argument must be in the form of `(js.. obj -field)` or (js.- obj field)")
   (let [[op & args] dot-form]
     (assert (or (= op 'js..)
@@ -127,4 +152,3 @@
                       (subs (str lst) 1)
                       (str lst))
                    ~value))))
-
