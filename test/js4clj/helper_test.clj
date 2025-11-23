@@ -2,18 +2,19 @@
   #_{:clj-kondo/ignore [:refer-all]}
   (:require
    [clojure.test :refer :all]
+   [js4clj.core :as core]))
 
 (deftest core-test
   (testing ""
-    (is (= (#'js4clj.core/to-camel-style
+    (is (= (#'core/to-camel-style
             "get-member")
            "getMember"))
-    (is (= (#'js4clj.core/to-camel-style
+    (is (= (#'core/to-camel-style
             "get-meta-object")
            "getMetaObject"))
-    (is (= (#'js4clj.core/to-camel-style
+    (is (= (#'core/to-camel-style
             "has-meta-parents")
            "hasMetaParents"))
-    (is (= (#'js4clj.core/to-camel-style
+    (is (= (#'core/to-camel-style
             "get-meta-parents")
            "getMetaParents"))))
