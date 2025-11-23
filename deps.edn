@@ -1,14 +1,13 @@
 {:paths ["src" "resources" "node_modules"]
- :deps {org.clojure/clojure {:mvn/version "1.11.1"}
  :deps {org.clojure/clojure {:mvn/version "1.12.3"}
         thheller/shadow-cljs {:mvn/version "3.2.1"}
         org.graalvm.polyglot/polyglot {:mvn/version "25.0.1"}
-        ;; You can't just do with a org.graalvm.polyglot/js 
-        ;; as specified in the graaljs documentation
-        ;; because it seems to require a maven plugin to work
-        org.graalvm.js/js-language {:mvn/version "25.0.1"}
+        org.graalvm.js/js-language {:local/root "jar/js-language-25.0.1-dev-20251121.165319-1.jar"}
         org.graalvm.truffle/truffle-runtime {:mvn/version "25.0.1"}
         cheshire/cheshire {:mvn/version "6.1.0"}
+        org.graalvm.regex/regex {:mvn/version "25.0.1"}
+        org.graalvm.truffle/truffle-api {:mvn/version "25.0.1"}
+        org.graalvm.shadowed/icu4j {:mvn/version "25.0.1"}
         }
  :aliases
  {:test {:extra-paths ["test"]

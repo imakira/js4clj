@@ -13,14 +13,14 @@
     (require/require-js '["luxon" :as grt-lux])
     (is (resolve 'grt-lux/DateTime)))
   (testing "Requiring commonjs modules test"
-    (require/require-cjs '["luxon" :as lux]
-                         '["luxon" :as lux2])
+    (require/require-js '["luxon" :as lux]
+                        '["luxon" :as lux2])
     (is (resolve 'lux/DateTime))
     (is (resolve 'lux2/DateTime)))
 
   (testing "Requiring esm modules test"
-    (require/require-esm '["node_modules/luxon/build/es6/luxon.mjs" :as elux]
-                         '["node_modules/luxon/build/es6/luxon.mjs" :as elux2])
+    (require/require-js '["node_modules/luxon/build/es6/luxon.mjs" :as elux]
+                        '["node_modules/luxon/build/es6/luxon.mjs" :as elux2])
     (is (resolve 'elux/DateTime))
     (is (resolve 'elux2/DateTime))
     (is (string? (js.. (var-get (resolve 'elux/DateTime)) now toString)))))
@@ -35,7 +35,7 @@
     (is (let [{:keys [f1 f2 f3 f4 load-ns as]} (#'require/parse-flags '[:f1 :f2 :load-ns :as name :f3 :f4])]
           (and f1 f2 f3 f4 load-ns (= as 'name))))))
 
-(require/require-cjs '["luxon" :as lux])
+(require/require-js '["luxon" :as lux])
 
 (deftest js-test
   (testing ""
