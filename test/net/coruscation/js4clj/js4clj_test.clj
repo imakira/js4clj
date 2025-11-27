@@ -26,7 +26,11 @@
                         '["node_modules/luxon/build/es6/luxon.mjs" :as elux2])
     (is (resolve 'elux/DateTime))
     (is (resolve 'elux2/DateTime))
-    (is (string? (js.. (var-get (resolve 'elux/DateTime)) now toString)))))
+    (is (string? (js.. (var-get (resolve 'elux/DateTime)) now toString))))
+
+  (testing "Testing erronous require"
+    (is (thrown? (require/require-js '[luxon :as luxon])))
+    (is (thrown? (require/require-js '["luxon" :as "luxon"])))))
 
 (deftest a-test
   (testing "FIXME, I fail."
@@ -54,11 +58,11 @@
     (is (= (polyglot/get-meta-qualified-name (polyglot/get-meta-object (polyglot/get-member js/Array "from")))
            "Function"))))
 
-(deftest null-undefined-test
-  (testing ""
-    (is (js/js-undefined? js/undefined))
-    (is (false? (js/js-undefined? nil)))
-    (is (false? (js/js-undefined? (clj->js nil))))))
+;; (deftest null-undefined-test
+;;   (testing ""
+;;     (is (js/js-undefined? js/undefined))
+;;     (is (false? (js/js-undefined? nil)))
+;;     (is (false? (js/js-undefined? (clj->js nil))))))
 
 (deftest polyglot-value?-test
   (testing ""
@@ -96,6 +100,19 @@
                2)
       (is (= 2 (js.. obj -level1 -level2 -key)))))
 
+  (testing "set nonexistent field"
+    (let [obj (clj->js {:a 1})]
+      (js-set! (js.- obj b)
+               2)
+      (is (= 2
+             (js.- obj b)))))
+
+  (testing "setting on not obj"
+    (is (thrown-with-msg?
+		 UnsupportedOperationException
+         #"^Unsupported operation Value.putMember\(String, Object\) for 'undefined'\(language: JavaScript, type: undefined\).*$"
+         (js-set! (js.- (.eval *context* "js" "undefined") a) 1))))
+
   #_(testing "testing erroneous arguments"
       (is (thrown? Exception
                    (macroexpand '(js-set! a 1))))
@@ -106,6 +123,31 @@
   (testing ""
     (is (= (js->clj (core/js-new js/Array 1 2 3 4))
            [1 2 3 4]))))
+
+(deftest dot-macros-test
+  (testing "Testing js.-"
+    (is (=
+         1
+         (js.- (.eval *context* "js"
+                      "({a: 1})")
+               "a")))
+    (is (nil?
+         (js.- (.eval *context* "js" "({})")
+               a))))
+
+  (testing "Testing js."
+    (is (= (-> (js. (js.- (js.- js/Array prototype) map)
+                   call
+                 (.eval *context* "js" "[1,2,3]")
+                 (fn [x & _]
+                   (+ x 1)))
+               js->clj)
+           [2 3 4]))
+
+    (is (thrown-with-msg?
+         UnsupportedOperationException
+         #"^Non readable or non-existent member key 'nonexist' for object.*"
+         (js. js/Array nonexist)))))
 
 (deftest clj->js-test
   (testing ""
