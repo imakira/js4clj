@@ -50,14 +50,34 @@
   Math
   Date
   String
+  RegExp
   Array
+  Int8Array
+  Uint8Array
+  Int16Array
+  Int32Array
+  Uint32Array
+  BigInt64Array
+  BigUint64Array
+  Float16Array
+  Float32Array
+  Float64Array
   Map
   Set
   WeakMap
   WeakSet
-  JSON
   ArrayBuffer
+  SharedArrayBuffer
+  DataView
+  Atomics
+  JSON
+  WeakRef
+  FinalizationRegistry
   Promise
+  Iterator
+  Reflect
+  Proxy
+  Intl
   console)
 
 (defn builtin
