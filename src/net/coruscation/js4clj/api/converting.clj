@@ -42,7 +42,10 @@
       (.isProxyObject value)))
 
 (defn clojurify-value [^org.graalvm.polyglot.Value value]
-  (cond (.isProxyObject value)
+  (cond (nil? value)
+        nil
+
+        (.isProxyObject value)
         (let [prox-obj (.asProxyObject value)]
           (if (get-raw-clojure-value prox-obj)
             (get-raw-clojure-value prox-obj)
