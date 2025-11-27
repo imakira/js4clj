@@ -14,9 +14,10 @@
   (testing "Generic Require Test"
     (require/require-js '["luxon" :as grt-lux])
     (is (resolve 'grt-lux/DateTime)))
+
   (testing "Requiring commonjs modules test"
-    (require/require-js '["luxon" :as lux]
-                        '["luxon" :as lux2])
+    (require/require-js '["./node_modules/luxon/build/cjs-browser/luxon.js" :as lux]
+                        '["./node_modules/luxon/build/cjs-browser/luxon.js" :as lux2])
     (is (resolve 'lux/DateTime))
     (is (resolve 'lux2/DateTime)))
 

@@ -59,3 +59,4 @@
 (define-unwrap-executable-alias canExecute)
 (define-unwrap-executable-alias execute [& args])
 (define-unwrap-executable-alias executeVoid [& args])
+(define-unwrap-executable-alias get-source-location [])

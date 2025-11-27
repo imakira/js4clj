@@ -1,16 +1,11 @@
 (ns js4clj.require
   (:require
-   [cheshire.core :refer [parse-string]]
-   [clojure.java.io :as io]
+   [clojure.core.async :as a]
    [clojure.string :as string]
-   [js4clj.context :refer [*context*]]
    [js4clj.api.converting :refer :all]
    [js4clj.api.polyglot :refer :all]
-   [js4clj.api.utils :refer [normalize-path-to-string]]
-   [clojure.core.async :as a])
-  (:import
-   [java.nio.file Path]
-   [java.util.regex Pattern]))
+   [js4clj.api.utils :refer [str->path]]
+   [js4clj.context :refer [*context*]]))
 
 (defn- parse-flags [args]
   (loop [args (lazy-seq args)
@@ -38,15 +33,36 @@
     (alias alias-name qualified-module-name)))
 
 (defn- require-module-dynamic [name]
-  (let  [module-promise (-> *context*
+  (let  [name (if (.startsWith name ".")
+                ;; Some hacky things going on here:
+                ;; `import` isn't really supposed to be abled to import
+                ;;   CommonJS modules, here it can, for some reason.
+                ;; It also isn't supposed to be able to import files that
+                ;;   are not in the `exports` fields in package.json.
+                ;; But the limitation doesn't seem to be fully implemented.
+                ;; You can stil import one using aboslute path.
+                ;; I consider it useful for some case.
+				(.toString (.toAbsolutePath (str->path name)))
+                name)
+         module-promise (-> *context*
                             (.eval "js"
                                    (str "import('" name "')")))
-         chann (a/chan 1)]
-    (invoke-member module-promise "then"
-                   (wrap-clojure-fn
-                    (fn [m]
-                      (a/>!! chann m))))
-    (a/<!! chann)))
+         chann (a/chan 1)
+         error (a/chan 1)]
+    (-> module-promise
+        (invoke-member "then"
+                       (wrap-clojure-fn
+                        (fn [m]
+                          (a/>!! chann m))))
+        (invoke-member "catch"
+                       (wrap-clojure-fn
+                        (fn [e]
+                          (a/>!! error e)))))
+
+    (a/alt!! chann ([module] module)
+             error ([e] (throw (ex-info "Module Import Error"
+                                        {:type ::module-import-error
+                                         :error e}))))))
 
 (defn require-js
   "(require-js '[\"module-name\" :alias ns])
@@ -65,4 +81,3 @@
   ([module & args]
    (require-js module)
    (when args (apply require-js args))))
-
