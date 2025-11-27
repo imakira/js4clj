@@ -87,13 +87,3 @@
        clojurify-value)
    (.getMember (.getBindings *context* "js") name)))
 
-
-(defn js-undefined?
-  "Check if a JavaScript value is undefined"
-  [obj]
-  (and (instance? org.graalvm.polyglot.Value obj)
-       (boolean
-        (some-> obj
-                get-meta-object
-                get-meta-qualified-name
-                (= "undefined")))))
