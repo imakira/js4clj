@@ -7,11 +7,14 @@
    [org.graalvm.polyglot Context Source Value]))
 
 (def ^{:dynamic true :private true} *no-clojurify* false)
+(def ^:private nullprint (java.io.PrintWriter. (proxy [java.io.OutputStream] []
+                                                 (write [_ _]))))
 
 (defn- define-builtin [ns primitive & [alias]]
-  (intern ns (if alias (symbol alias) (symbol primitive))
-          ((if *no-clojurify* identity clojurify-value)
-           (.getMember (.getBindings *context* "js") primitive))))
+  (binding [*err* nullprint]
+    (intern ns (if alias (symbol alias) (symbol primitive))
+            ((if *no-clojurify* identity clojurify-value)
+             (.getMember (.getBindings *context* "js") primitive)))))
 
 (defmacro ^:private define-builtins
   {:clj-kondo/lint-as 'clojure.core/declare}
