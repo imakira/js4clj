@@ -29,8 +29,12 @@
     (is (string? (js.. (var-get (resolve 'elux/DateTime)) now toString))))
 
   (testing "Testing erronous require"
-    (is (thrown? (require/require-js '[luxon :as luxon])))
-    (is (thrown? (require/require-js '["luxon" :as "luxon"])))))
+    (is (thrown?
+         Throwable
+         (require/require-js '[luxon :as luxon])))
+    (is (thrown?
+         Throwable
+         (require/require-js '["luxon" :as "luxon"])))))
 
 (deftest a-test
   (testing "FIXME, I fail."
