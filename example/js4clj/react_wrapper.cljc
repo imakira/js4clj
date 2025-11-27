@@ -1,10 +1,10 @@
 (ns js4clj.react-wrapper
-  #?(:clj (:require [js4clj.require :refer [require-cjs]]
+  #?(:clj (:require [js4clj.require :refer [require-js]]
                     [js4clj.utils :refer [clj->js js->clj]])
      :cljs (:require ["react" :as react]))
   #?(:cljs (:require-macros [js4clj.react-wrapper :refer [defcomp if-cljs]])))
 
-#?(:clj (require-cjs '["react" :as react]))
+#?(:clj (require-js '["react" :as react]))
 
 (defn cljs-env?
   "Take the &env from a macro, and tell whether we are expanding into cljs."
