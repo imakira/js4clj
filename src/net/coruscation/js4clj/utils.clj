@@ -5,6 +5,12 @@
             [net.coruscation.js4clj.js :as js :refer [builtin]]))
 
 #_{:clj-kondo/ignore [:syntax]}
+(defn- js-call-helper [obj method & args]
+  `(apply invoke-member ~obj ~(str method)
+          ;; evaluate args before passing  to polyglotalize-clojure
+          (map polyglotalize-clojure (list ~@args))))
+
+#_{:clj-kondo/ignore [:syntax]}
 (defmacro js.
   "(js. object method) => object.method()
 
@@ -13,9 +19,10 @@
   {:clj-kondo/ignore [:unresolved-symbol :type-mismatch]}
   [obj method & args]
   `(clojurify-value
-    (apply invoke-member ~obj ~(str method)
-           ;; evaluate args before passing  to polyglotalize-clojure
-           (map polyglotalize-clojure (list ~@args)))))
+    ~(apply js-call-helper obj method args)))
+
+(defn- js-get-helper [obj field]
+  `(get-member ~obj ~(str field)))
 
 (defmacro js.-
   "(js.- object field) => object.field
@@ -24,7 +31,23 @@
   "
   {:clj-kondo/ignore [:unresolved-symbol :type-mismatch]}
   [obj field]
-  `(#'clojurify-value (get-member ~obj ~(str field))))
+  `(clojurify-value ~(js-get-helper obj field)))
+
+(defn- js-chan-access-helper [obj & args]
+  (if (empty? args)
+    obj
+    (let [curr# (first args)
+          rest# (rest args)]
+      (apply js-chan-access-helper
+             (cond (seq? curr#)
+                   (apply js-call-helper obj (first curr#) (rest curr#))
+
+                   (.startsWith (str curr#)
+                                "-")
+                   (js-get-helper obj (subs (str curr#) 1))
+                   :else
+                   (js-call-helper obj curr#))
+             rest#))))
 
 #_{:clj-kondo/ignore [:syntax]}
 (defmacro js..
@@ -33,19 +56,7 @@
   Chained field access or method invoking of `object`, like the builtin `..`"
   {:clj-kondo/ignore [:unresolved-symbol :type-mismatch]}
   [obj & args]
-  (if (empty? args)
-    obj
-    (let [curr# (first args)
-          rest# (rest args)]
-      `(js.. ~(cond (seq? curr#)
-                    `(js. ~obj ~(first curr#) ~@(rest curr#))
-
-                    (.startsWith (str curr#)
-                                 "-")
-                    `(js.- ~obj ~(subs (str curr#) 1))
-                    :else
-                    `(js. ~obj ~curr#))
-         ~@rest#))))
+  `(clojurify-value ~(apply js-chan-access-helper obj args)))
 
 (defn- create-js-array [& args]
   (apply js-new (builtin "Array") args))

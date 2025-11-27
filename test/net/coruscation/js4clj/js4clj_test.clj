@@ -151,7 +151,18 @@
     (is (thrown-with-msg?
          UnsupportedOperationException
          #"^Non readable or non-existent member key 'nonexist' for object.*"
-         (js. js/Array nonexist)))))
+         (js. js/Array nonexist))))
+
+  (testing "Testing js.."
+    ;; JavaScript String as represented as TruffleString by GraalVM
+    ;;   other than a regular JavaScript object
+    ;; So we can't use properties of a JavaScript string
+    (is (thrown?
+         UnsupportedOperationException
+         (js.. lux/DateTime
+           now
+           toString
+           -length)))))
 
 (deftest clj->js-test
   (testing ""
@@ -211,4 +222,3 @@
     (is (polyglot/get-member js/Array "from") "We can get its static method")
     (is (= (js->clj (js. js/Array from (clj->js [1 2 3])))
            [1 2 3]) "We can also call its static method")))
-
