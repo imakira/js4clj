@@ -1,13 +1,13 @@
-(ns js4clj.js4clj-test
+(ns net.coruscation.js4clj.js4clj-test
   #_{:clj-kondo/ignore [:refer-all]}
   (:require [clojure.test :refer :all]
-            [js4clj.require :as require]
-            [js4clj.core :as core]
-            [js4clj.api.converting :as converting]
-            [js4clj.js :as js]
-            [js4clj.api.polyglot :as polyglot]
-            [js4clj.context :refer [*context*]]
-            [js4clj.utils :refer [js. js.. js.- js-set! clj->js js->clj ]]))
+            [net.coruscation.js4clj.require :as require]
+            [net.coruscation.js4clj.core :as core]
+            [net.coruscation.js4clj.api.converting :as converting]
+            [net.coruscation.js4clj.js :as js]
+            [net.coruscation.js4clj.api.polyglot :as polyglot]
+            [net.coruscation.js4clj.context :refer [*context*]]
+            [net.coruscation.js4clj.utils :refer [js. js.. js.- js-set! clj->js js->clj ]]))
 
 (deftest require-test
 

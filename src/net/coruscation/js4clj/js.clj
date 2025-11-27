@@ -1,7 +1,7 @@
-(ns js4clj.js
-  (:require [js4clj.context :refer [*context*]]
-            [js4clj.api.converting :refer [clojurify-value]]
-            [js4clj.api.polyglot :refer :all])
+(ns net.coruscation.js4clj.js
+  (:require [net.coruscation.js4clj.context :refer [*context*]]
+            [net.coruscation.js4clj.api.converting :refer [clojurify-value]]
+            [net.coruscation.js4clj.api.polyglot :refer :all])
   (:import
    [java.util HashMap]
    [org.graalvm.polyglot Context Source Value]))
@@ -33,7 +33,7 @@
   (.getMember (.getBindings *context* "js") "undefined"))
 
 #_{:clojure-lsp/ignore [:clojure-lsp/unused-public-var]}
-(define-builtins js4clj.js
+(define-builtins net.coruscation.js4clj.js
   globalThis
   Infinity
   NaN

@@ -1,8 +1,8 @@
-(ns js4clj.helper-test
+(ns net.coruscation.js4clj.helper-test
   #_{:clj-kondo/ignore [:refer-all]}
   (:require
    [clojure.test :refer :all]
-   [js4clj.api.converting :as core]))
+   [net.coruscation.js4clj.api.converting :as core]))
 
 (deftest core-test
   (testing ""

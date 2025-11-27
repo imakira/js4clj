@@ -1,6 +1,6 @@
 (ns js4clj.react-wrapper
-  #?(:clj (:require [js4clj.require :refer [require-js]]
-                    [js4clj.utils :refer [clj->js js->clj]])
+  #?(:clj (:require [net.coruscation.js4clj.require :refer [require-js]]
+                    [net.coruscation.js4clj.utils :refer [clj->js js->clj]])
      :cljs (:require ["react" :as react]))
   #?(:cljs (:require-macros [js4clj.react-wrapper :refer [defcomp if-cljs]])))
 

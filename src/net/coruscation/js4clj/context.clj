@@ -1,4 +1,4 @@
-(ns js4clj.context 
+(ns net.coruscation.js4clj.context
   (:import
    [java.util HashMap]
    [org.graalvm.polyglot Context]))

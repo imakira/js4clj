@@ -1,7 +1,7 @@
 (ns js4clj.server
   (:require [hiccup2.core :as h]
             [hiccup.util :refer [raw-string]]
-            [js4clj.require :refer [require-js]]
+            [net.coruscation.js4clj.require :refer [require-js]]
             [js4clj.components :as comps]
             [ring.adapter.jetty :as jetty]
             [ring.middleware.file :refer [wrap-file]]))

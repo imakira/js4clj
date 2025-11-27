@@ -1,4 +1,4 @@
-(ns js4clj.api.utils
+(ns net.coruscation.js4clj.api.utils
   (:import
    [java.nio.file Path]))
 

@@ -1,8 +1,8 @@
-(ns js4clj.utils
-  (:require [js4clj.api.converting :refer :all]
-            [js4clj.api.polyglot :refer :all]
-            [js4clj.core :refer :all]
-            [js4clj.js :as js :refer [builtin]]))
+(ns net.coruscation.js4clj.utils
+  (:require [net.coruscation.js4clj.api.converting :refer :all]
+            [net.coruscation.js4clj.api.polyglot :refer :all]
+            [net.coruscation.js4clj.core :refer :all]
+            [net.coruscation.js4clj.js :as js :refer [builtin]]))
 
 #_{:clj-kondo/ignore [:syntax]}
 (defmacro js.

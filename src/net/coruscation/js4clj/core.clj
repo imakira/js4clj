@@ -1,6 +1,6 @@
-(ns js4clj.core
-  (:require [js4clj.api.polyglot :refer :all]
-            [js4clj.api.converting :refer :all]))
+(ns net.coruscation.js4clj.core
+  (:require [net.coruscation.js4clj.api.polyglot :refer :all]
+            [net.coruscation.js4clj.api.converting :refer :all]))
 
 
 (defn js-fn?

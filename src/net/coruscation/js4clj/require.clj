@@ -1,11 +1,11 @@
-(ns js4clj.require
+(ns net.coruscation.js4clj.require
   (:require
    [clojure.core.async :as a]
    [clojure.string :as string]
-   [js4clj.api.converting :refer :all]
-   [js4clj.api.polyglot :refer :all]
-   [js4clj.api.utils :refer [str->path]]
-   [js4clj.context :refer [*context*]]))
+   [net.coruscation.js4clj.api.converting :refer :all]
+   [net.coruscation.js4clj.api.polyglot :refer :all]
+   [net.coruscation.js4clj.api.utils :refer [str->path]]
+   [net.coruscation.js4clj.context :refer [*context*]]))
 
 (defn- parse-flags [args]
   (loop [args (lazy-seq args)

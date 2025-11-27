@@ -1,6 +1,6 @@
-(ns js4clj.api.converting
-  (:require [js4clj.context :refer [*context*]]
-            [js4clj.api.polyglot :refer :all])
+(ns net.coruscation.js4clj.api.converting
+  (:require [net.coruscation.js4clj.context :refer [*context*]]
+            [net.coruscation.js4clj.api.polyglot :refer :all])
   (:import (org.graalvm.polyglot Value Context)))
 
 (declare clojurify-value)

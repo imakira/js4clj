@@ -1,4 +1,4 @@
-(ns js4clj.api.polyglot
+(ns net.coruscation.js4clj.api.polyglot
   (:require
    [clojure.string :as string]))
 
