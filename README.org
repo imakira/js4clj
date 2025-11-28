@@ -1,5 +1,111 @@
-Very early stage of development, check [[https://github.com/imakira/js4clj/blob/master/test/js4clj/js4clj_test.clj][js4clj_test.clj]] for some examples.
+~js4clj~ is a library aiming for facilitating the interop between Clojure and JavaScript on JVM using GraalVM and GraalJS.
 
-You can also check this [[https://github.com/imakira/js4clj/tree/master/example/js4clj][minimal example using react]]
+** Prerequisite & Installation
 
-Check this this blog for what this project is about and roughly how it is done [[https://coruscation.net/blogs/experiment-with-graalvm--clojure--and-javascript.html][Experiment with GraalVM, Clojure, and JavaScript.]]
+TODO
+
+** Usage
+
+*** Requiring Namespaces
+
+#+BEGIN_SRC clojure
+  (ns net.coruscation.js4clj.example
+    (:require
+     [net.coruscation.js4clj.require :refer [require-js]]
+     [net.coruscation.js4clj.utils :refer [js. js.- js.. clj->js js->clj js-set!]]
+     [net.coruscation.js4clj.core :refer [js-new]]
+     [net.coruscation.js4clj.js :as js]))
+#+END_SRC
+
+*** Using JavaScript Libraries
+
+Install JavaScript libraries in the project root using npm like usual.
+
+#+BEGIN_SRC bash
+  npm init
+  npm i luxon # luxon as an example
+#+END_SRC
+
+#+BEGIN_SRC clojure
+  ;; we can use luxon as a namespace now, for example: luxon/DateTime
+  (require-js '["luxon" :as luxon])
+#+END_SRC
+
+#+RESULTS:
+: nil
+
+*** Converting data between Clojure and JavaScript
+
+This library provides two functions similar to those of ClojureScript: ~js->clj~ and ~clj->js~.
+
+#+BEGIN_SRC clojure :results none
+  ;; result: #object[org.graalvm.polyglot.Value 0x22b60c71 "{key: \"value\"}"]
+  (def js-obj (clj->js {:key "value"}))
+  ;; result: {:key "value"}
+  (js->clj js-obj :keywordize-keys true) 
+#+END_SRC
+
+*** Calling JavaScript functions, get/set JavaScript properties
+
+Similar to ClojureScript, this libraries provides four macros: ~js.~ ~js.-~ ~js..~ and ~js-set!~
+
+We can use ~js.~ to call a method of an Object.
+
+#+BEGIN_SRC clojure :resultsq none
+  (def current-time (js. luxon/DateTime now))
+  ;; result: "2025-11-27T23:27:34.853+08:00"
+  (js. current-time toString) 
+#+END_SRC
+
+
+We can use ~js.-~ to access properties of an object.
+
+#+BEGIN_SRC clojure :results none
+  ;; result: "value"
+  (js.- (clj->js {:key "value"})
+  	  key) 
+#+END_SRC
+
+We can also use ~js..~ to chain the calling
+
+#+BEGIN_SRC clojure
+  (js.. luxon/DateTime now toString)
+#+END_SRC
+
+We can also use ~js..~ to access property by using ~-~ as a prefix:
+
+#+BEGIN_SRC clojure
+  (js.. luxon/DateTime
+    (fromObject (clj->js {:day 22}))
+    (plus (clj->js {:day 1}))
+    ;; results: 23
+    -day) 
+#+END_SRC
+
+The library also provides a ~js-set!~, it must be used along with ~js.-~ or ~js..~.
+
+#+BEGIN_SRC clojure
+  (let [obj (clj->js {})]
+    (js-set! (js.- obj key)
+             "value")
+
+    (js.- obj key) ;; "value"
+
+    (js-set! (js.. obj -key)
+             "new value")
+    (js.- obj key) ;; "new value"
+    )
+#+END_SRC
+
+** Examples
+
+You can check this [[https://github.com/imakira/js4clj/tree/master/example/js4clj][minimal Server Side Rendering with Client Side Rehydration example using react]].
+
+** Links
+
+This project is inspired by:
+
+- [[https://github.com/clj-python/libpython-clj][libpython-clj]]
+- [[https://github.com/plandes/clj-py4j][py4clj]]
+ 
+Check this blog about roughly how it is done [[https://coruscation.net/blogs/experiment-with-graalvm--clojure--and-javascript.html][Experiment with GraalVM, Clojure, and JavaScript.]]
