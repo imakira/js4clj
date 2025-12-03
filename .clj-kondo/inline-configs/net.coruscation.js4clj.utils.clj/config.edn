@@ -1,0 +1,1 @@
+{:config-in-call {net.coruscation.js4clj.utils/js. {:ignore [:unresolved-symbol :type-mismatch]}, net.coruscation.js4clj.utils/js.- {:ignore [:unresolved-symbol :type-mismatch]}, net.coruscation.js4clj.utils/js.. {:ignore [:unresolved-symbol :type-mismatch]}}}
