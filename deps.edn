@@ -1,16 +1,16 @@
 {:paths ["src" "resources" "node_modules"]
  :deps {org.clojure/clojure {:mvn/version "1.12.3"}
-        thheller/shadow-cljs {:mvn/version "3.2.1"}
         org.graalvm.polyglot/polyglot {:mvn/version "25.0.1"}
         org.graalvm.js/js-language {:local/root "jar/js-language-25.0.1-dev-20251121.165319-1.jar"}
         org.graalvm.truffle/truffle-runtime {:mvn/version "25.0.1"}
         cheshire/cheshire {:mvn/version "6.1.0"}
         org.graalvm.regex/regex {:mvn/version "25.0.1"}
         org.graalvm.truffle/truffle-api {:mvn/version "25.0.1"}
-        org.graalvm.shadowed/icu4j {:mvn/version "25.0.1"}
-        }
+        org.graalvm.shadowed/icu4j {:mvn/version "25.0.1"}}
  :aliases
  {:test {:extra-paths ["test"]
+ {:cljs {:extra-deps {thheller/shadow-cljs {:mvn/version "3.2.1"}}}
+  :test {:extra-paths ["test"]
          :extra-deps {org.clojure/test.check {:mvn/version "1.1.1"}
                       io.github.cognitect-labs/test-runner
                       {:git/tag "v0.5.1" :git/sha "dfb30dd"}}}

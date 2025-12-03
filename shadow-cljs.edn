@@ -1,4 +1,4 @@
-{:deps {:aliases [:example :test]}
+{:deps {:aliases [:cljs :example :test]}
  :dev-http {8080 {:roots ["public"]}}
  :builds {:app
           {:target :browser
