@@ -2,19 +2,19 @@
   #_{:clj-kondo/ignore [:refer-all]}
   (:require
    [clojure.test :refer :all]
-   [net.coruscation.js4clj.api.converting :as core]))
+   [net.coruscation.js4clj.api.polyglot :as polyglot]))
 
 (deftest core-test
   (testing ""
-    (is (= (#'core/to-camel-style
+    (is (= (#'polyglot/to-camel-style
             "get-member")
            "getMember"))
-    (is (= (#'core/to-camel-style
+    (is (= (#'polyglot/to-camel-style
             "get-meta-object")
            "getMetaObject"))
-    (is (= (#'core/to-camel-style
+    (is (= (#'polyglot/to-camel-style
             "has-meta-parents")
            "hasMetaParents"))
-    (is (= (#'core/to-camel-style
+    (is (= (#'polyglot/to-camel-style
             "get-meta-parents")
            "getMetaParents"))))
