@@ -13,9 +13,6 @@
   (with-meta clojure-value
     {::raw-polyglot-value polyglot-value}))
 
-(defn get-raw-polyglot-value [clojure-value-with-metadata]
-  (::raw-polyglot-value (meta clojure-value-with-metadata)))
-
 (defn polyglot-value [obj]
   (or (::raw-polyglot-value (meta obj))
       (and (instance? org.graalvm.polyglot.Value obj)

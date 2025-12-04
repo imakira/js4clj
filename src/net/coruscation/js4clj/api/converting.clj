@@ -15,8 +15,8 @@
               f)))
 
 (defn polyglotalize-clojure [value]
-  (cond (get-raw-polyglot-value value)
-        (get-raw-polyglot-value value)
+  (cond (polyglot-value value)
+        (polyglot-value value)
 
         (fn? value)
         (wrap-clojure-fn value)
