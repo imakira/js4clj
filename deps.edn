@@ -1,5 +1,6 @@
 {:paths ["src" "resources" "node_modules"]
  :deps {org.clojure/clojure {:mvn/version "1.12.3"}
+        org.clojure/core.async {:mvn/version "1.8.741"}
         org.graalvm.polyglot/polyglot {:mvn/version "25.0.1"}
         org.graalvm.js/js-language {:local/root "jar/js-language-25.0.1-dev-20251121.165319-1.jar"}
         org.graalvm.truffle/truffle-runtime {:mvn/version "25.0.1"}
@@ -8,7 +9,6 @@
         org.graalvm.truffle/truffle-api {:mvn/version "25.0.1"}
         org.graalvm.shadowed/icu4j {:mvn/version "25.0.1"}}
  :aliases
- {:test {:extra-paths ["test"]
  {:cljs {:extra-deps {thheller/shadow-cljs {:mvn/version "3.2.1"}}}
   :test {:extra-paths ["test"]
          :extra-deps {org.clojure/test.check {:mvn/version "1.1.1"}
