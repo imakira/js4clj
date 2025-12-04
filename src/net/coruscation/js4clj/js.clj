@@ -7,39 +7,28 @@
    [org.graalvm.polyglot Context Source Value]))
 
 (def ^{:dynamic true :private true} *no-clojurify* false)
+
 (def ^:private nullprint (java.io.PrintWriter. (proxy [java.io.OutputStream] []
                                                  (write [_ _]))))
-
-(defn- define-builtin [ns primitive & [alias]]
+(defn- define-builtin [ns primitive]
   (binding [*err* nullprint]
-    (intern ns (if alias (symbol alias) (symbol primitive))
-            ((if *no-clojurify* identity clojurify-value)
-             (.getMember (.getBindings *context* "js") primitive)))))
+    (intern ns (with-meta primitive
+                 {:doc (str "A symbol stands for js `" (name primitive) "`")})
+            (symbol (name ns) (name primitive)))))
 
 (defmacro ^:private define-builtins
   {:clj-kondo/lint-as 'clojure.core/declare}
   [ns & primitives]
   (create-ns ns)
   `(doseq [primitive# '~primitives]
-     (define-builtin '~ns (str primitive#))))
-
-;; In cljs there is also a js/undefined
-;;	in which (= nil js/undefined) but we can't mimic it.
-;; Still, we need a js/undefined in case we need to do some
-;; 	very specific interop.
-(def undefined
-  "Internal representation of `undefined` in JavaScript.
-
-  Only use this when you want to pass a undefined value to a JavaScript function.
-
-  Unlike ClojureScript, this value does not equal to `nil`"
-  (.getMember (.getBindings *context* "js") "undefined"))
+     (define-builtin '~ns primitive#)))
 
 #_{:clojure-lsp/ignore [:clojure-lsp/unused-public-var]}
 (define-builtins net.coruscation.js4clj.js
   globalThis
   Infinity
   NaN
+  undefined
   Object
   Function
   Boolean

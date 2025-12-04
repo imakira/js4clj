@@ -1,6 +1,7 @@
 (ns net.coruscation.js4clj.api.polyglot
   (:require
-   [clojure.string :as string]))
+   [clojure.string :as string]
+   [net.coruscation.js4clj.context :refer [*context*]]))
 
 (defn with-raw-clojure-value [polyglot-value clojure-value]
   (with-meta polyglot-value
@@ -14,9 +15,20 @@
     {::raw-polyglot-value polyglot-value}))
 
 (defn polyglot-value [obj]
-  (or (::raw-polyglot-value (meta obj))
-      (and (instance? org.graalvm.polyglot.Value obj)
-           obj)))
+  (cond (::raw-polyglot-value (meta obj))
+        (::raw-polyglot-value (meta obj))
+
+        (and (symbol? obj)
+             (= (namespace obj)
+                (name 'net.coruscation.js4clj.js)))
+        (.getMember (.getBindings *context* "js")
+                    (name obj))
+
+        (instance? org.graalvm.polyglot.Value obj)
+        obj
+
+        :else
+        nil))
 
 (defn- to-camel-style [s]
   (string/replace s #"-([a-z])" (fn [g]

@@ -56,7 +56,7 @@
 
 (deftest wrapper-method-test
   (testing ""
-    (is (function? js/Array))
+    ;; (is (function? js/Array))
     (is (= (polyglot/get-meta-qualified-name (polyglot/get-meta-object js/Array))
            "Function"))
     (is (= (polyglot/get-meta-qualified-name (polyglot/get-meta-object (polyglot/get-member js/Array "from")))
@@ -70,10 +70,22 @@
 
 (deftest polyglot-value?-test
   (testing ""
-    (is (true? (fn? js/Array)) "js/Array is a clojure fn")
-    (is (boolean (polyglot/polyglot-value js/Array)) "js/Array is also a polyglot value")
-    (is (isa? (class (polyglot/polyglot-value js/Array))
-              org.graalvm.polyglot.Value) "It returns the wrapped Value")))
+    (is (true? (symbol? js/Array)) "js/Array is just a symbol now")
+    (is (instance? org.graalvm.polyglot.Value (polyglot/polyglot-value js/Array) ) "We turn it into a polyglot value using polyglot-value")
+    (is (true? (fn? (converting/clojurify-value (polyglot/polyglot-value js/Array)))) "We can't use it as a function now, maybe we need to solve this problem in the future")))
+
+(deftest special-js-namespace-test
+  (testing ""
+    (is (symbol? js/Array)
+        "It is just a symbol")
+    (is (= (js->clj (core/js-new js/Array 1 2 3))
+           [1 2 3])
+        "We can use it as the class")
+    (is (= (js->clj (core/js-new js/Array js/undefined js/undefined))
+           [nil nil])
+        "We can pass it as arguments")
+    (is (true? (core/js-fn? js/Array))
+        "functions starting with js- will treat these symbols as js values")))
 
 (deftest js-array?-test
   (testing ""
@@ -82,9 +94,6 @@
     (is (false? (core/js-array? js/undefined)) "returns false, no error threw")))
 
 (deftest js->clj-test
-  (testing "Default testing"
-    (is (nil? (js->clj js/undefined)))
-    (is (fn? (js->clj js/Array))))
 
   (testing "Testing builitn types, they should be returned as is"
     (is (nil? (js->clj nil)))
@@ -216,7 +225,7 @@
 
 (deftest executable-javascript-object-test
   (testing ""
-    (is (function? js/Array) "It is a clojure function")
+    (is (not (function? js/Array)) "We can not use it as a Clojure function now")
     (is (core/js-fn? js/Array) "It is also a javascript function")
     (is (polyglot/can-instantiate js/Array)  "We can also instantiate it")
     (is (polyglot/get-member js/Array "from") "We can get its static method")
