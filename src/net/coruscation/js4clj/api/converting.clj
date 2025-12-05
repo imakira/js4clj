@@ -7,7 +7,7 @@
 (declare polyglotalize-clojure)
 
 (defn wrap-clojure-fn [f]
-  (.asValue *context*
+  (.asValue @*context*
             (with-raw-clojure-value
               (reify org.graalvm.polyglot.proxy.ProxyExecutable
                 (execute [_ ^"[Lorg.graalvm.polyglot.Value;" values]
@@ -23,7 +23,7 @@
 
         :else
         ;; https://www.graalvm.org/sdk/javadoc/org/graalvm/polyglot/Context.html#asValue(java.lang.Object)
-        (.asValue *context* value)))
+        (.asValue @*context* value)))
 
 (defn wrap-polyglot-executable [^org.graalvm.polyglot.Value obj]
   (with-raw-polyglot-value

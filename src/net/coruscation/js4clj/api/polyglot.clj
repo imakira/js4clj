@@ -21,7 +21,7 @@
         (and (symbol? obj)
              (= (namespace obj)
                 (name 'net.coruscation.js4clj.js)))
-        (.getMember (.getBindings *context* "js")
+        (.getMember (.getBindings @*context* "js")
                     (name obj))
 
         (instance? org.graalvm.polyglot.Value obj)

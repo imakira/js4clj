@@ -1,13 +1,13 @@
 (ns net.coruscation.js4clj.js4clj-test
   #_{:clj-kondo/ignore [:refer-all]}
   (:require [clojure.test :refer :all]
-            [net.coruscation.js4clj.require :as require]
-            [net.coruscation.js4clj.core :as core]
             [net.coruscation.js4clj.api.converting :as converting]
-            [net.coruscation.js4clj.js :as js]
             [net.coruscation.js4clj.api.polyglot :as polyglot]
-            [net.coruscation.js4clj.context :refer [*context*]]
-            [net.coruscation.js4clj.utils :refer [js. js.. js.- js-set! clj->js js->clj ]]))
+            [net.coruscation.js4clj.context :refer [*context* default-builder]]
+            [net.coruscation.js4clj.core :as core]
+            [net.coruscation.js4clj.js :as js]
+            [net.coruscation.js4clj.require :as require]
+            [net.coruscation.js4clj.utils :refer [clj->js js->clj js-set! js. js.- js..]]))
 
 (deftest require-test
 
@@ -124,7 +124,7 @@
     (is (thrown-with-msg?
 		 UnsupportedOperationException
          #"^Unsupported operation Value.putMember\(String, Object\) for 'undefined'\(language: JavaScript, type: undefined\).*$"
-         (js-set! (js.- (.eval *context* "js" "undefined") a) 1))))
+         (js-set! (js.- (.eval @*context* "js" "undefined") a) 1))))
 
   #_(testing "testing erroneous arguments"
       (is (thrown? Exception
@@ -141,19 +141,19 @@
   (testing "Testing js.-"
     (is (=
          1
-         (js.- (.eval *context* "js"
+         (js.- (.eval @*context* "js"
                       "({a: 1})")
                "a")))
     (is (nil?
-         (js.- (.eval *context* "js" "({})")
+         (js.- (.eval @*context* "js" "({})")
                a))))
 
   (testing "Testing js."
     (is (= (-> (js. (js.- (js.- js/Array prototype) map)
-                   call
-                 (.eval *context* "js" "[1,2,3]")
-                 (fn [x & _]
-                   (+ x 1)))
+                    call
+                    (.eval @*context* "js" "[1,2,3]")
+                    (fn [x & _]
+                      (+ x 1)))
                js->clj)
            [2 3 4]))
 
@@ -169,16 +169,16 @@
     (is (thrown?
          UnsupportedOperationException
          (js.. lux/DateTime
-           now
-           toString
-           -length)))))
+               now
+               toString
+               -length)))))
 
 (deftest clj->js-test
   (testing ""
     (let [dt (js. lux/DateTime fromObject
-               (clj->js {:year 2012 :day 22 :hour 12})
-               (clj->js {:zone "America/Los_Angeles"
-                         :numberingSystem "beng"}))]
+                  (clj->js {:year 2012 :day 22 :hour 12})
+                  (clj->js {:zone "America/Los_Angeles"
+                            :numberingSystem "beng"}))]
       (is (= (:year (:c (js->clj dt :keywordize-keys true)))
              2012))
       (is (= (:year (:c (js->clj dt :keywordize-keys true)))
@@ -201,7 +201,7 @@
            6))
 
     (let [double (fn [x] (* 2 x))
-          js-identity (.eval *context* "js" "(function (x) {return x;})")
+          js-identity (.eval @*context* "js" "(function (x) {return x;})")
           js-identity-wrapped (converting/clojurify-value js-identity)]
       (is (= double (js-identity-wrapped double)))))
 
@@ -231,3 +231,34 @@
     (is (polyglot/get-member js/Array "from") "We can get its static method")
     (is (= (js->clj (js. js/Array from (clj->js [1 2 3])))
            [1 2 3]) "We can also call its static method")))
+
+
+(deftest multithread-test
+  (testing ""
+    (try (let [future1 (future
+                         (dotimes [i 1000]
+                           (clj->js {:a "1"})))
+               future2 (future
+                         (dotimes [i 1000]
+                           (clj->js {:a "1"})))]
+           (list @future1 @future2))
+         (catch java.util.concurrent.ExecutionException e
+           (is (instance? java.lang.IllegalStateException
+                          (.getCause e))))))
+
+  ;; TODO: require-js is not compatible with multithreading usage
+  (testing ""
+    (let [future1 (future
+                    (binding [*context*
+                              (atom (.build (default-builder)))]
+                      (dotimes [i 1000]
+                        (clj->js {:a "1"})))
+                    true)
+          future2 (future
+                    (binding [*context*
+                              (atom (.build (default-builder)))]
+                      (dotimes [i 1000]
+                        (clj->js {:a "1"})))
+                    true)]
+      (is (= (list @future1 @future2)
+             [true true])))))

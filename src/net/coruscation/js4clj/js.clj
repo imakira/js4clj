@@ -74,4 +74,4 @@
   [name]
   ((if *no-clojurify* identity
        clojurify-value)
-   (.getMember (.getBindings *context* "js") name)))
+   (.getMember (.getBindings @*context* "js") name)))

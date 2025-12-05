@@ -44,7 +44,7 @@
                 ;; I consider it useful for some case.
 				(.toString (.toAbsolutePath (str->path module-name)))
                 module-name)
-         module-promise (-> *context*
+         module-promise (-> @*context*
                             (.eval "js"
                                    (str "import('" name "')")))
          chann (a/chan 1)
