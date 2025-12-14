@@ -1,3 +1,5 @@
+[[https://clojars.org/net.coruscation/js4clj][https://img.shields.io/clojars/v/net.coruscation/js4clj.svg]]
+
 ~js4clj~ is a library aiming for facilitating the interop between Clojure and JavaScript on JVM using GraalVM and GraalJS.
 
 ** Prerequisite & Installation
