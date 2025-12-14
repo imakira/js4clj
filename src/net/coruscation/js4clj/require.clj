@@ -64,6 +64,38 @@
                                         {:type ::module-import-error
                                          :error e}))))))
 
+
+(defn- require-commonjs-module [name]
+  (let  [module (-> @*context*
+                    (.eval "js"
+                           (str "require('" name "')")))]
+    (assert (.hasMembers module)
+            (str name " is not a module"))
+    module))
+
+
+(defn require-helper
+  [require-module-fn]
+  (letfn [(do-require ([[module-name & flags]]
+                       (when-not (string? module-name)
+                         (throw (ex-info "module-name must be a string"
+                                         {:module-name module-name
+                                          :expected-type String
+                                          :received-type (class module-name)})))
+                       (let [flag-map (parse-flags flags)
+                             module (require-module-fn module-name)
+                             alias-name (:as flag-map)
+                             qualified-module-name (symbol (str "js4clj.modules." (normalize-module-name module-name)))]
+                         (when-not (symbol? alias-name)
+                           (throw (ex-info "alias must be a string"
+                                           {:alias alias-name
+                                            :expected-type clojure.lang.Symbol
+                                            :received-type (class alias-name)})))
+                         (internal-module module qualified-module-name alias-name))))]
+    (fn [modules]
+      (doseq [module modules]
+        (do-require module)))))
+
 (defn require-js
   "(require-js '[\"module-name\" :alias ns])
 
@@ -72,22 +104,15 @@
   Like node.js, this function finds JavaScript modules from the node_modules directory,
     it supports ECMAScript modules and legacy CommonJS modules."
   {:clj-kondo/lint-as 'clojure.core/require}
-  ([[module-name & flags]]
-   (when-not (string? module-name)
-     (throw (ex-info "module-name must be a string"
-                     {:module-name module-name
-                      :expected-type String
-                      :received-type (class module-name)})))
-   (let [flag-map (parse-flags flags)
-         module (require-module-dynamic module-name)
-         alias-name (:as flag-map)
-         qualified-module-name (symbol (str "js4clj.modules." (normalize-module-name module-name)))]
-     (when-not (symbol? alias-name)
-       (throw (ex-info "alias must be a string"
-                       {:alias alias-name
-                        :expected-type clojure.lang.Symbol
-                        :received-type (class alias-name)})))
-     (internal-module module qualified-module-name alias-name)))
-  ([module & args]
-   (require-js module)
-   (when args (apply require-js args))))
+  [& module-specs]
+  ((require-helper require-module-dynamic) module-specs))
+
+(defn require-cjs
+  "Like `require-js` but use `require` internally instead of `import`
+
+  It exists mainly due to `import` provided by GraalJS will error out when there's an `exports` field in the package.json, even when `main` field is presented. While `require` will ignore `exports`.
+
+  Also check https://github.com/oracle/graaljs/pull/904, this function will be useless if the upstream issue is resolved."
+  {:clj-kondo/lint-as 'clojure.core/require}
+  [& module-specs]
+  ((require-helper require-commonjs-module) module-specs))
