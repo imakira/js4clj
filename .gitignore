@@ -31,8 +31,6 @@ NOTES.org
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,clojure,commonlisp,emacs
 
 ### Clojure ###
-pom.xml
-pom.xml.asc
 *.jar
 *.class
 /lib/

@@ -1,1 +1,1 @@
-{:lint-as {net.coruscation.js4clj.require/require-js clojure.core/require}}
+{:lint-as {net.coruscation.js4clj.require/require-js clojure.core/require, net.coruscation.js4clj.require/require-cjs clojure.core/require}}

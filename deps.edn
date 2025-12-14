@@ -2,28 +2,29 @@
  :deps {org.clojure/clojure {:mvn/version "1.12.3"}
         org.clojure/core.async {:mvn/version "1.8.741"}
         org.graalvm.polyglot/polyglot {:mvn/version "25.0.1"}
-        org.graalvm.js/js-language {:local/root "jar/js-language-25.0.1-dev-20251121.165319-1.jar"}
         org.graalvm.truffle/truffle-runtime {:mvn/version "25.0.1"}
-        cheshire/cheshire {:mvn/version "6.1.0"}
-        org.graalvm.regex/regex {:mvn/version "25.0.1"}
-        org.graalvm.truffle/truffle-api {:mvn/version "25.0.1"}
-        org.graalvm.shadowed/icu4j {:mvn/version "25.0.1"}}
+        org.graalvm.js/js-language {:mvn/version "25.0.1"}}
  :aliases
- {:cljs {:extra-deps {thheller/shadow-cljs {:mvn/version "3.2.1"}}}
+ {:customized-graal {:extra-deps
+                     {org.graalvm.js/js-language {:local/root "jar/js-language-25.0.1-dev-20251121.165319-1.jar"}
+                      org.graalvm.regex/regex {:mvn/version "25.0.1"}
+                      org.graalvm.truffle/truffle-api {:mvn/version "25.0.1"}
+                      org.graalvm.shadowed/icu4j {:mvn/version "25.0.1"}}}
+  :cljs {:extra-deps {thheller/shadow-cljs {:mvn/version "3.2.1"}}}
   :test {:extra-paths ["test"]
          :extra-deps {org.clojure/test.check {:mvn/version "1.1.1"}
                       io.github.cognitect-labs/test-runner
                       {:git/tag "v0.5.1" :git/sha "dfb30dd"}}}
-  :build {:deps {io.github.clojure/tools.build
-                 {:git/tag "v0.9.2" :git/sha "fe6b140"}
-                 slipset/deps-deploy {:mvn/version "0.2.0"}}
-          :ns-default build}
-  :neil {:project {:name net.coruscation/js4clj}}
   :example {:extra-paths ["example"]
             :extra-deps {hiccup/hiccup {:mvn/version "2.0.0"}
                          ring/ring-core {:mvn/version "1.15.3"}
                          ring-cors/ring-cors {:mvn/version "0.1.13"}
                          ring/ring-jetty-adapter {:mvn/version "1.15.3"}}}
+  :build {:deps {io.github.clojure/tools.build
+                 {:git/tag "v0.9.2" :git/sha "fe6b140"}
+                 slipset/deps-deploy {:mvn/version "0.2.0"}}
+          :ns-default build}
+  :neil {:project {:name net.coruscation/js4clj}}
   :codox {:extra-deps {codox/codox {:mvn/version "0.10.8"}}
           :exec-fn codox.main/generate-docs
           :exec-args {:name "net.coruscation.js4clj"

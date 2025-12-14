@@ -21,16 +21,16 @@
 
 (defn- jar-opts [opts]
   (assoc opts
-          :lib lib :version version
-          :jar-file (format "target/%s-%s.jar" lib version)
-          :scm {:tag (str "v" version)}
-          :basis (b/create-basis {})
-          :class-dir class-dir
-          :target "target"
-          :src-dirs ["src"]))
+         :lib lib :version version
+         :jar-file (format "target/%s-%s.jar" lib version)
+         :scm {:tag (str "v" version)}
+         :basis (b/create-basis {})
+         :class-dir class-dir
+         :src-pom "./pom.xml"
+         :target "target"
+         :src-dirs ["src"]))
 
-(defn ci "Run the CI pipeline of tests (and build the JAR)." [opts]
-  (test opts)
+(defn jar "build the JAR" [& [opts]]
   (b/delete {:path "target"})
   (let [opts (jar-opts opts)]
     (println "\nWriting pom.xml...")
@@ -41,12 +41,16 @@
     (b/jar opts))
   opts)
 
+(defn ci "Run the CI pipeline of tests (and build the JAR)." [opts]
+  (test opts)
+  (jar opts))
+
 (defn install "Install the JAR locally." [opts]
   (let [opts (jar-opts opts)]
     (b/install opts))
   opts)
 
-(defn deploy "Deploy the JAR to Clojars." [opts]
+(defn deploy "Deploy the JAR to Clojars." [& [opts]]
   (let [{:keys [jar-file] :as opts} (jar-opts opts)]
     (dd/deploy {:installer :remote :artifact (b/resolve-path jar-file)
                 :pom-file (b/pom-path (select-keys opts [:lib :class-dir]))}))
