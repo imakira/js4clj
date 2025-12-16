@@ -30,7 +30,7 @@ Install JavaScript libraries in the project root using npm like usual.
 
 #+BEGIN_SRC clojure
   ;; we can use luxon as a namespace now, for example: luxon/DateTime
-  (require-js '["luxon" :as luxon])
+  (require-cjs '["luxon" :as luxon])
 #+END_SRC
 
 #+RESULTS:
