@@ -1,7 +1,11 @@
 (ns net.coruscation.js4clj.context
   (:import
    [java.util HashMap]
-   [org.graalvm.polyglot Context]))
+   [org.graalvm.polyglot Context])
+  (:require [clojure.java.io :as io]))
+
+(defonce ^{:dynamic true :private true} *cjs-cwd* (str (System/getProperty "user.dir")
+                                                       "/node_modules"))
 
 (defn default-builder
   "Return a `org.graalvm.polyglot.Context$Builder` object with necessary options set for js4clj to function properly.
@@ -16,13 +20,15 @@
 
   "
   []
+  (let [cwd-dir (io/file *cjs-cwd*)]
+    (when (not (.exists cwd-dir))
+      (.mkdirs cwd-dir)))
   (-> (Context/newBuilder (into-array String ["js"]))
       (.allowExperimentalOptions true)
       (.options (HashMap.
                  {"js.esm-eval-returns-exports" "true"
                   "js.commonjs-require" "true"
-                  "js.commonjs-require-cwd" (str (System/getProperty "user.dir")
-                                                 "/node_modules")}))
+                  "js.commonjs-require-cwd" *cjs-cwd*}))
       (.allowIO true)))
 
 (defonce ^{:dynamic true
