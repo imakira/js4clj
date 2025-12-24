@@ -1,0 +1,22 @@
+name: "Test"
+on: push
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    permissions:                # Job-level permissions configuration starts here
+      contents: write           # 'write' access to repository contents
+    steps:
+      - uses: actions/checkout@v5
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - run: nix run .#docs
+      - name: Commit files
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -a -m "automatically generate api docs"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          branch: docs
