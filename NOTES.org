@@ -1,3 +1,0 @@
-* ESM Module Loading
-
-It turns out it's really hard to use the file system customization approach to customize the module loading processing (while simultaneously support both esm and cjs module). It turns out the builtin ~js.commonjs-require~ option not only support node-like module finding algorithms to ~require()~ function, but also to the esm ~import~ directive. The only problem is that it currently doens't support ~exports~ option in package.json. We use a patch graaljs jar to solve this problem for now.
