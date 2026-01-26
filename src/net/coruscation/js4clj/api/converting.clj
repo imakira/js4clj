@@ -76,3 +76,12 @@
         ;; polyglot time, date, time zone, instant, duration
         :else
         value))
+
+(defn js-undefined-raw?
+  "Check if an value is an instance of `org.graalvm.polyglot.Value` and of JavaScript `undefined` value"
+  [value]
+  (and (instance? org.graalvm.polyglot.Value value)
+       (= (some-> value
+                  (.getMetaObject)
+                  (.getMetaQualifiedName))
+          "undefined")))
