@@ -26,3 +26,5 @@
 
   Example (js-new js/Array 1 2 3) => [1 2 3]"
   (apply new-instance obj (map polyglotalize-clojure args)))
+
+
