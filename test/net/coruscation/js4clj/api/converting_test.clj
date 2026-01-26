@@ -17,4 +17,3 @@
         (.eval @context/*context* "js" "[]")))))
 
 (use-fixtures :each #'fresh-context)
-

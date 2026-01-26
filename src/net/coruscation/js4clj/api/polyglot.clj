@@ -3,7 +3,8 @@
    [clojure.string :as string]
    [net.coruscation.js4clj.context :refer [*context*]]))
 
-(defn with-raw-clojure-value [polyglot-value clojure-value]
+(defn with-raw-clojure-value
+  [polyglot-value clojure-value]
   (with-meta polyglot-value
     {::raw-clojure-value clojure-value}))
 
@@ -14,7 +15,9 @@
   (with-meta clojure-value
     {::raw-polyglot-value polyglot-value}))
 
-(defn polyglot-value [obj]
+(defn polyglot-value
+  "Return the Polyglot Value of an object if it is one or is/has a reference to one"
+  [obj]
   (cond (::raw-polyglot-value (meta obj))
         (::raw-polyglot-value (meta obj))
 

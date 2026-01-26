@@ -6,7 +6,10 @@
 (declare clojurify-value)
 (declare polyglotalize-clojure)
 
-(defn wrap-clojure-fn [f]
+(defn wrap-clojure-fn
+  "Wrap a Clojure fn as a Polyglot Executable.
+   Retrieve the original clojure fn back using `(polyglot/get-raw-clojure-value (.asProxyObject value))`"
+  [f]
   (.asValue @*context*
             (with-raw-clojure-value
               (reify org.graalvm.polyglot.proxy.ProxyExecutable
@@ -25,14 +28,19 @@
         ;; https://www.graalvm.org/sdk/javadoc/org/graalvm/polyglot/Context.html#asValue(java.lang.Object)
         (.asValue @*context* value)))
 
-(defn wrap-polyglot-executable [^org.graalvm.polyglot.Value obj]
+(defn wrap-polyglot-executable
+  "Wrap a Polyglot Value as a Clojure fn, so that they can be easily used from the Clojure side.
+   The returned fn has metadata created using `polyglot/with-raw-polyglot-value`, and you can retrieve the original Polyglot Value from the fn using `polyglot/polyglot-value`"
+  [^org.graalvm.polyglot.Value obj]
   (with-raw-polyglot-value
     (fn [& args]
       (clojurify-value (.execute obj (into-array Object (map polyglotalize-clojure args)))))
     obj))
 
 
-(defn clojurify? [^org.graalvm.polyglot.Value value]
+(defn clojurify?
+  "Check if a Polyglot Value can be converted into a Clojure value."
+  [^org.graalvm.polyglot.Value value]
   (or (.isBoolean value)
       (.isNull value)
       (.isString value)
