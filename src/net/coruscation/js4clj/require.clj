@@ -32,7 +32,9 @@
   (when alias-name
     (alias alias-name qualified-module-name)))
 
-(defn- require-module-dynamic [module-name]
+(defn load-es-module
+  "Load a module using `import()`, return the module object"
+  [module-name]
   (let  [name (if (.startsWith module-name ".")
                 ;; Some hacky things going on here:
                 ;; `import` isn't really supposed to be abled to import
@@ -65,7 +67,9 @@
                                          :error e}))))))
 
 
-(defn- require-commonjs-module [name]
+(defn load-commonjs-module
+  "Load a module using `require`, return the module object."
+  [name]
   (let  [module (-> @*context*
                     (.eval "js"
                            (str "require('" name "')")))]
@@ -105,7 +109,7 @@
     it supports ECMAScript modules and legacy CommonJS modules."
   {:clj-kondo/lint-as 'clojure.core/require}
   [& module-specs]
-  ((require-helper require-module-dynamic) module-specs))
+  ((require-helper load-es-module) module-specs))
 
 (defn require-cjs
   "Like `require-js` but use `require` internally instead of `import`
@@ -115,4 +119,4 @@
   Also check https://github.com/oracle/graaljs/pull/904, this function will be useless if the upstream issue is resolved."
   {:clj-kondo/lint-as 'clojure.core/require}
   [& module-specs]
-  ((require-helper require-commonjs-module) module-specs))
+  ((require-helper load-commonjs-module) module-specs))
