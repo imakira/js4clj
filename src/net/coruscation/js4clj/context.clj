@@ -4,9 +4,12 @@
    [org.graalvm.polyglot Context])
   (:require [clojure.java.io :as io]))
 
-(defonce ^{:dynamic true :private true} *cjs-cwd*
-  (str (System/getProperty "user.dir")
-       "/node_modules"))
+(def ^{:dynamic true} *js-cwd*
+  "cwd of the javascript environment when doing `require` or `import`.
+  In most cases it is the directory contains `node_modules`
+
+  Default: cwd of the Clojure process"
+  (System/getProperty "user.dir"))
 
 (defn default-builder
   "Return a `org.graalvm.polyglot.Context$Builder` object with necessary options set for js4clj to function properly.
@@ -21,15 +24,17 @@
 
   "
   []
-  (let [cwd-dir (io/file *cjs-cwd*)]
+  (let [cwd-dir (io/file *js-cwd*)]
     (when (not (.exists cwd-dir))
       (.mkdirs cwd-dir)))
   (-> (Context/newBuilder (into-array String ["js"]))
       (.allowExperimentalOptions true)
       (.options (HashMap.
-                 {"js.esm-eval-returns-exports" "true"
-                  "js.commonjs-require" "true"
-                  "js.commonjs-require-cwd" *cjs-cwd*}))
+                 (merge {"js.esm-eval-returns-exports" "true"}
+                        (if *js-cwd*
+                          {"js.commonjs-require" "true"
+                           "js.commonjs-require-cwd" *js-cwd*}
+                          {}))))
       (.allowIO true)))
 
 (def ^:dynamic *context-per-thread*

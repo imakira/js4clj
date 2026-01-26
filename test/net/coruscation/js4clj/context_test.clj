@@ -3,8 +3,13 @@
    [clojure.test :refer [deftest is use-fixtures]]
    [net.coruscation.js4clj.context :as subject]
    [net.coruscation.js4clj.js :as js]
+   [net.coruscation.js4clj.require :as require]
    [net.coruscation.js4clj.test-utils :refer [fresh-context]]
    [net.coruscation.js4clj.utils :refer [js-set! js.-]]))
+
+(use-fixtures :each #'fresh-context)
+
+(def test-js-cwd  "test/resources/js-cwd")
 
 (deftest *context-per-thread*-test
   (binding [subject/*context-per-thread* true]
@@ -45,4 +50,8 @@
   (is (nil? (js.- js/globalThis
                   demo))))
 
-(use-fixtures :each #'fresh-context)
+(deftest *js-cwd*-test
+  (binding [subject/*js-cwd* test-js-cwd]
+    (subject/reinitialize-context!)
+    (is (= "index.js" (js.- (require/load-es-module "sample-package")
+                            name)))))
