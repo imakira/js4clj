@@ -55,7 +55,7 @@
   "A fn takes no arguments, called after a context is created, with *context* bound to the newly created context."
   nil)
 
-(declare *context*)
+(declare ^:dynamic *context*)
 
 (defn context-new
   "Create a context, respect `customize-builder` and `after-init-hook`"
@@ -75,25 +75,24 @@
                                      (fn []
                                        (context-new))))
 
-(def ^{:dynamic true
-       :doc
-       "When `*context-per-thread*` is false, deref it returns the global context,
-        When `*context-per-thread*` is true, deref it returns the thread local context.
+(def ^:dynamic *context*
+  "When `*context-per-thread*` is false, deref it returns the global context,
+   When `*context-per-thread*` is true, deref it returns the thread local context.
 
-	    In any case, if it is not already initialized, initialize it with `context-new`
+   In any case, if it is not already initialized, initialize it with `context-new`
 
-	    You can bind it with an IDeref instance to manage context."}
-  *context* (reify clojure.lang.IDeref
-              (deref [_]
-                (if *context-per-thread*
-                  (.get thread-local-context)
-                  (if (not (nil? @global-context))
-                    @global-context
-                    (swap! global-context
-                           (fn [old]
-                             (if old
-                               old
-                               (context-new)))))))))
+   You can bind it with an IDeref instance to manage context."
+  (reify clojure.lang.IDeref
+    (deref [_]
+      (if *context-per-thread*
+        (.get thread-local-context)
+        (if (not (nil? @global-context))
+          @global-context
+          (swap! global-context
+                 (fn [old]
+                   (if old
+                     old
+                     (context-new)))))))))
 
 (defn reinitialize-context!
   "If `*context-per-thread*` is false, reinitialize the global `*context*` with `context-new`.
