@@ -163,3 +163,19 @@
                       (subs (str lst) 1)
                       (str lst))
                    ~value))))
+
+
+(defn js-select-keys
+  "Returns a map containing only those entries in the JavaScript object whose key is in keys
+  You can use strings or keywords as keys, and it will return a map using strings or keywords as keys correspondently"
+  [obj keys]
+  (into {} (for [key keys]
+             (let [key-str (name key)]
+               (if (has-member obj key-str)
+                 [key (clojurify-value (get-member obj key-str))]
+                 nil)))))
+
+(defmacro select-keys-bind [keys obj & body]
+  `(let [{:keys [~@keys]}
+         (js-select-keys ~obj ~(mapv keyword keys))]
+     ~@body))

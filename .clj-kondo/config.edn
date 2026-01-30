@@ -1,1 +1,3 @@
-{:lint-as {js4clj.react-wrapper/defcomp clojure.core/defn}}
+{:lint-as {js4clj.react-wrapper/defcomp clojure.core/defn}
+ :hooks {:macroexpand {net.coruscation.js4clj.utils/select-keys-bind
+                       net.coruscation.js4clj.utils/select-keys-bind}}}
