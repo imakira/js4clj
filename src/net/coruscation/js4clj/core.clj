@@ -26,3 +26,13 @@
 
   Example (js-new js/Array 1 2 3) => [1 2 3]"
   (apply new-instance obj (map polyglotalize-clojure args)))
+
+(defn js-aget
+  "Get value of `key` from `object`"
+  [object key]
+  (clojurify-value (get-member object key)))
+
+(defn js-aset
+  "Set value of `key` from `object` to `value`"
+  [object key value]
+  (put-member object key (polyglotalize-clojure value)))
