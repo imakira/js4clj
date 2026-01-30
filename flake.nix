@@ -21,6 +21,7 @@
           packages = with pkgs.${system}; [
             clojure
             gnumake
+            emacs
           ];
         };
       });
