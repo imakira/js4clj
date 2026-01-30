@@ -72,3 +72,5 @@
 (define-unwrap-executable-alias execute [& args])
 (define-unwrap-executable-alias executeVoid [& args])
 (define-unwrap-executable-alias get-source-location [])
+(define-unwrap-executable-alias has-members)
+(define-unwrap-executable-alias has-member [^String identifier])
