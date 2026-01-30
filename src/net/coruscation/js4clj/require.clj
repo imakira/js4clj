@@ -1,11 +1,9 @@
 (ns net.coruscation.js4clj.require
   (:require
-   [clojure.core.async :as a]
    [clojure.string :as string]
    [net.coruscation.js4clj.api.converting :refer :all]
-   [net.coruscation.js4clj.api.polyglot :refer :all]
-   [net.coruscation.js4clj.api.utils :refer [str->path]]
-   [net.coruscation.js4clj.context :refer [*context*]]))
+   [net.coruscation.js4clj.api.modules :as modules]
+   [net.coruscation.js4clj.api.polyglot :refer :all]))
 
 (defn- parse-flags [args]
   (loop [args (lazy-seq args)
@@ -35,47 +33,13 @@
 (defn load-es-module
   "Load a module using `import()`, return the module object"
   [module-name]
-  (let  [name (if (.startsWith module-name ".")
-                ;; Some hacky things going on here:
-                ;; `import` isn't really supposed to be abled to import
-                ;;   CommonJS modules, here it can, for some reason.
-                ;; It also isn't supposed to be able to import files that
-                ;;   are not in the `exports` fields in package.json.
-                ;; But the limitation doesn't seem to be fully implemented.
-                ;; You can stil import one using aboslute path.
-                ;; I consider it useful for some case.
-				(.toString (.toAbsolutePath (str->path module-name)))
-                module-name)
-         module-promise (-> @*context*
-                            (.eval "js"
-                                   (str "import('" name "')")))
-         chann (a/chan 1)
-         error (a/chan 1)]
-    (-> module-promise
-        (invoke-member "then"
-                       (wrap-clojure-fn
-                        (fn [m]
-                          (a/>!! chann m))))
-        (invoke-member "catch"
-                       (wrap-clojure-fn
-                        (fn [e]
-                          (a/>!! error e)))))
-
-    (a/alt!! chann ([module] module)
-             error ([e] (throw (ex-info "Module Import Error"
-                                        {:type ::module-import-error
-                                         :error e}))))))
+  (modules/load-es-module module-name))
 
 
 (defn load-commonjs-module
   "Load a module using `require`, return the module object."
-  [name]
-  (let  [module (-> @*context*
-                    (.eval "js"
-                           (str "require('" name "')")))]
-    (assert (.hasMembers module)
-            (str name " is not a module"))
-    module))
+  [module-name]
+  (modules/load-commonjs-module module-name))
 
 
 (defn require-helper
