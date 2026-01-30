@@ -6,7 +6,7 @@
 
 TODO
 
-** Usage
+** Baisc Usage
 
 *** Requiring Namespaces
 
@@ -98,6 +98,10 @@ The library also provides a ~js-set!~, it must be used along with ~js.-~ or ~js.
     (js.- obj key) ;; "new value"
     )
 #+END_SRC
+
+** More Usage
+
++ Multithreading and Context Management :: [[./docs/multithread-and-context-management.org]]
 
 ** Examples
 
