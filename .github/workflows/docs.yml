@@ -10,7 +10,9 @@ jobs:
       - uses: cachix/install-nix-action@v31
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
-      - run: nix run .#docs
+      - name: docs
+        shell: 'nix develop .#ci -c bash -e {0}'
+        run: make docs-gen
       - name: Commit files
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
