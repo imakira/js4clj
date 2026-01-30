@@ -71,7 +71,9 @@
 
 (def ^:private global-context (atom nil))
 
-(def ^:private thread-local-context (ThreadLocal/withInitial (constantly {})))
+(def ^:private thread-local-context (ThreadLocal/withInitial
+                                     (fn []
+                                       (context-new))))
 
 (def ^{:dynamic true
        :doc
