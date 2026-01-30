@@ -16,6 +16,7 @@ $(OUT_DIR)/%.md: $(ORG_DIR)/%.org
 	mkdir -p $(OUT_DIR)
 	emacs --batch \
 		--eval "(require 'ox-md)" \
+		--eval "(setq org-export-with-toc nil)" \
 		$< \
 		--funcall org-md-export-to-markdown \
 		&> /dev/null

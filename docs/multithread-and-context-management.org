@@ -4,7 +4,7 @@ Like ~JavaScript~, a GraalJS context is single-threaded, and only a single threa
 
 This library provides ways to do that.
 
-*** Binding ~context/*context*~
+*** Binding context/*context*
 
 ~js4clj~ gets it context by reading ~context/*context*~. It is of ~clojure.lang.IDeref~ type and you can use your own context by dynamically binding it.
 
@@ -19,7 +19,7 @@ This library provides ways to do that.
 - It will override ~context/*context-per-thread*~ (introduced in the next section).
 - ~context/reinitialize-context!~ won't work as expected if you bound ~*context*~.
 
-*** ~context/*context-per-thread*~
+*** context/*context-per-thread*
 
 If you bind ~context/*context-per-thread*~ to ~true~ (without binding ~*context*~). ~@context/*context*~ will return the thread local context, create one in case it isn't already existed. (Note: you can customize the context by binding ~context/*customize-builder*~ and ~context/*after-init-hook*~) 
 
