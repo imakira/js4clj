@@ -28,7 +28,9 @@
                                   net.coruscation.js4clj.core
                                   net.coruscation.js4clj.utils
                                   net.coruscation.js4clj.js
-                                  net.coruscation.js4clj.api.polyglot]
+                                  net.coruscation.js4clj.api.polyglot
+                                  net.coruscation.js4clj.embedding
+                                  net.coruscation.js4clj.context]
                      :output-path "docs"}}
   :kaocha {:extra-deps {lambdaisland/kaocha {:mvn/version "1.91.1392"}}
            :main-opts ["-m" "kaocha.runner"]}}}
