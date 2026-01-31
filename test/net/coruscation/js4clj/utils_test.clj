@@ -22,8 +22,8 @@
                                  [:a :b :c])))
   ;; key can be determined at run time
   (let [key :a]
-    (= {:a 1} (subject/js-select-keys (clj->js {:a 1})
-                                      [key]))))
+    (is (= {:a 1} (subject/js-select-keys (clj->js {:a 1})
+                                          [key])))))
 
 (deftest select-keys-bind-test
   (subject/select-keys-bind

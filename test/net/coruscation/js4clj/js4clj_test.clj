@@ -12,12 +12,12 @@
 (deftest require-test
 
   (testing "Generic Require Test"
-    (require/require-js '["luxon" :as grt-lux])
+    (require/require-cjs '["luxon" :as grt-lux])
     (is (resolve 'grt-lux/DateTime)))
 
   (testing "Requiring commonjs modules test"
-    (require/require-js '["./node_modules/luxon/build/cjs-browser/luxon.js" :as lux]
-                        '["./node_modules/luxon/build/cjs-browser/luxon.js" :as lux2])
+    (require/require-cjs '["./node_modules/luxon/build/cjs-browser/luxon.js" :as lux]
+                         '["./node_modules/luxon/build/cjs-browser/luxon.js" :as lux2])
     (is (resolve 'lux/DateTime))
     (is (resolve 'lux2/DateTime)))
 
@@ -31,10 +31,10 @@
   (testing "Testing erronous require"
     (is (thrown?
          Throwable
-         (require/require-js '[luxon :as luxon])))
+         (require/require-cjs '[luxon :as luxon])))
     (is (thrown?
          Throwable
-         (require/require-js '["luxon" :as "luxon"])))))
+         (require/require-cjs '["luxon" :as "luxon"])))))
 
 (deftest a-test
   (testing "FIXME, I fail."
@@ -46,7 +46,7 @@
     (is (let [{:keys [f1 f2 f3 f4 load-ns as]} (#'require/parse-flags '[:f1 :f2 :load-ns :as name :f3 :f4])]
           (and f1 f2 f3 f4 load-ns (= as 'name))))))
 
-(require/require-js '["luxon" :as lux])
+(require/require-cjs '["luxon" :as lux])
 
 (deftest js-test
   (testing ""
