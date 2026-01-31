@@ -2,7 +2,8 @@
   (:import
    [java.util HashMap]
    [org.graalvm.polyglot Context])
-  (:require [clojure.java.io :as io]))
+  (:require [clojure.java.io :as io]
+            [clojure.edn :as edn]))
 
 (def ^{:dynamic true} *js-cwd*
   "cwd of the javascript environment when doing `require` or `import`.
@@ -10,6 +11,22 @@
 
   Default: cwd of the Clojure process"
   (System/getProperty "user.dir"))
+
+
+(def ^:dynamic *js-resource-path*
+  "net.coruscation.js4clj")
+
+(def ^:private extracted-js-resources (atom nil))
+
+(defn- extract-js-resources! []
+  (when-let [manifest-file (io/resource (str *js-resource-path* "/manifest.edn"))]
+    (let [manifest (edn/read-string (slurp manifest-file))
+          dest-path (.toString (java.nio.file.Files/createTempDirectory "net.coruscation.js4clj" (into-array java.nio.file.attribute.FileAttribute [])))]
+      (doseq [file manifest]
+        (if (.endsWith file "/")
+          (.mkdir (io/file (str dest-path "/" file)))
+          (spit (io/file (str dest-path "/" file)) (slurp (io/resource (str *js-resource-path* "/" file))))))
+      dest-path)))
 
 (defn default-builder
   "Return a `org.graalvm.polyglot.Context$Builder` object with necessary options set for js4clj to function properly.
@@ -24,16 +41,26 @@
 
   "
   []
-  (let [cwd-dir (io/file *js-cwd*)]
-    (when (not (.exists cwd-dir))
-      (.mkdirs cwd-dir)))
+  (when (and (io/resource (str *js-resource-path* "/manifest.edn"))
+             (not @extracted-js-resources))
+    (swap! extracted-js-resources
+           (fn [old]
+             (if old
+               old
+               (extract-js-resources!))))) 
+
+  (when (not @extracted-js-resources)
+    (let [cwd-dir (io/file *js-cwd*)]
+      (when (not (.exists cwd-dir))
+        (.mkdirs cwd-dir))))
+
   (-> (Context/newBuilder (into-array String ["js"]))
       (.allowExperimentalOptions true)
       (.options (HashMap.
                  (merge {"js.esm-eval-returns-exports" "true"}
-                        (if *js-cwd*
+                        (if (or @extracted-js-resources *js-cwd*)
                           {"js.commonjs-require" "true"
-                           "js.commonjs-require-cwd" *js-cwd*}
+                           "js.commonjs-require-cwd" (or @extracted-js-resources *js-cwd*)}
                           {}))))
       (.allowIO true)))
 

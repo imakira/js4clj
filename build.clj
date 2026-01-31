@@ -21,8 +21,7 @@
 
 (defn- jar-opts [opts]
   (assoc opts
-         :lib lib :version version
-         :jar-file (format "target/%s-%s.jar" lib version)
+         :lib lib :version version :jar-file (format "target/%s-%s.jar" lib version)
          :scm {:tag (str "v" version)}
          :basis (b/create-basis {})
          :class-dir class-dir
